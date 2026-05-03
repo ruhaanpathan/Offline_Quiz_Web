@@ -12,7 +12,7 @@ $flash = getFlash();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Registration — QuizLAN</title>
+    <title>Student Registration — LANparty</title>
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 
@@ -21,7 +21,7 @@ $flash = getFlash();
         <div class="auth-card animate-fade">
             <div class="auth-logo">
                 <div class="logo-icon">⚡</div>
-                <h1>QuizLAN</h1>
+                <h1>LANparty</h1>
                 <p class="auth-subtitle">Student Registration</p>
             </div>
 

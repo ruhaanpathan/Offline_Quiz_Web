@@ -1,6 +1,6 @@
 <?php
 /**
- * QuizLAN — Session Management
+ * LANparty — Session Management
  * Start session and provide helper functions
  */
 

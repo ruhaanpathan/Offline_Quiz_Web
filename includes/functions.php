@@ -1,6 +1,6 @@
 <?php
 /**
- * QuizLAN — Helper Functions
+ * LANparty — Helper Functions
  */
 
 /**

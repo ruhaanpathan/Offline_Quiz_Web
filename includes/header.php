@@ -10,8 +10,8 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="QuizLAN — Offline-first live quiz platform for colleges">
-    <title><?= isset($pageTitle) ? sanitize($pageTitle) . ' — QuizLAN' : 'QuizLAN' ?></title>
+    <meta name="description" content="LANparty — Offline-first live quiz platform for colleges">
+    <title><?= isset($pageTitle) ? sanitize($pageTitle) . ' — LANparty' : 'LANparty' ?></title>
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 
@@ -19,7 +19,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
     <nav class="navbar">
         <a href="/" class="navbar-brand">
             <div class="logo-icon">⚡</div>
-            QuizLAN
+            LANparty
         </a>
         <?php if (isLoggedIn()): ?>
             <ul class="navbar-nav">
