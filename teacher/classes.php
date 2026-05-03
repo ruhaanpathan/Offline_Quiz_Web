@@ -47,7 +47,7 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
 
     <?php if (empty($classes)): ?>
-        <div class="card"><div class="empty-state"><div class="empty-icon">📚</div><h3>No classes yet</h3><p>Create your first class to start adding students and quizzes.</p>
+        <div class="card"><div class="empty-state"><div class="empty-icon"></div><h3>No classes yet</h3><p>Create your first class to start adding students and quizzes.</p>
         <button class="btn btn-primary" onclick="QuizLAN.openModal('createClassModal')">+ Create Class</button></div></div>
     <?php else: ?>
         <div class="card-grid">
@@ -61,12 +61,12 @@ require_once __DIR__ . '/../includes/header.php';
                     <form method="POST" style="display:inline;" onclick="event.stopPropagation();">
                         <input type="hidden" name="action" value="delete_class">
                         <input type="hidden" name="class_id" value="<?= $c['id'] ?>">
-                        <button type="submit" class="btn-icon btn btn-outline" onclick="return confirm('Delete this class and all its data?')" title="Delete">🗑️</button>
+                        <button type="submit" class="btn-icon btn btn-outline" onclick="return confirm('Delete this class and all its data?')" title="Delete"></button>
                     </form>
                 </div>
                 <div style="display:flex;gap:12px;">
-                    <span class="badge badge-blue">👥 <?= $c['student_count'] ?> students</span>
-                    <span class="badge badge-purple">📝 <?= $c['quiz_count'] ?> quizzes</span>
+                    <span class="badge badge-blue"><?= $c['student_count'] ?> students</span>
+                    <span class="badge badge-purple"><?= $c['quiz_count'] ?> quizzes</span>
                 </div>
                 <div style="margin-top:12px;font-size:0.8rem;color:var(--text-muted);">Created <?= formatDate($c['created_at']) ?></div>
             </div>

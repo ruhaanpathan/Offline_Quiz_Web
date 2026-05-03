@@ -1,6 +1,6 @@
 <?php
 /**
- * QuizLAN — Database Connection
+ * LANparty — Database Connection
  * Reads credentials from .env file for security
  */
 

@@ -56,16 +56,16 @@ require_once __DIR__ . '/../includes/header.php';
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:32px;">
         <div class="stat-card">
             <div class="stat-icon <?= $accuracy >= 70 ? 'green' : ($accuracy >= 40 ? 'orange' : 'red') ?>">
-                <?= $accuracy >= 70 ? '🏆' : ($accuracy >= 40 ? '📊' : '📉') ?>
+                <?= icon('award') ?>
             </div>
             <div class="stat-info"><h4>Score</h4><div class="stat-value"><?= $quiz['total_correct'] ?>/<?= $quiz['total_questions'] ?></div></div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon blue">📊</div>
+            <div class="stat-icon blue"><?= icon('target') ?></div>
             <div class="stat-info"><h4>Accuracy</h4><div class="stat-value"><?= $accuracy ?>%</div></div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon purple">📅</div>
+            <div class="stat-icon purple"><?= icon('calendar') ?></div>
             <div class="stat-info"><h4>Date</h4><div class="stat-value" style="font-size:0.9rem;"><?= formatDate($quiz['ended_at'] ?? $quiz['started_at']) ?></div></div>
         </div>
     </div>
@@ -89,16 +89,16 @@ require_once __DIR__ . '/../includes/header.php';
                         </span>
                         <div>
                             <div style="font-weight:600;line-height:1.5;"><?= sanitize($q['question_text']) ?></div>
-                            <span style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;display:inline-block;">📂 <?= sanitize($q['topic_name']) ?></span>
+                            <span style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;display:inline-block;"><?= sanitize($q['topic_name']) ?></span>
                         </div>
                     </div>
                     <div style="text-align:right;flex-shrink:0;margin-left:12px;">
                         <?php if ($isCorrect): ?>
-                            <span style="color:var(--accent-green);font-weight:700;">✅ Correct</span>
+                            <span style="color:var(--accent-green);font-weight:700;">Correct</span>
                         <?php elseif ($unanswered): ?>
-                            <span style="color:var(--text-muted);font-weight:600;">⏭️ Skipped</span>
+                            <span style="color:var(--text-muted);font-weight:600;">⏭Skipped</span>
                         <?php else: ?>
-                            <span style="color:var(--accent-red, #ff3860);font-weight:700;">❌ Wrong</span>
+                            <span style="color:var(--accent-red, #ff3860);font-weight:700;">Wrong</span>
                         <?php endif; ?>
                         <?php if ($q['time_taken_seconds'] > 0): ?>
                             <div style="font-size:0.75rem;color:var(--text-muted);"><?= $q['time_taken_seconds'] ?>s</div>
@@ -117,12 +117,12 @@ require_once __DIR__ . '/../includes/header.php';
                             $bg = 'rgba(72,199,142,0.15)';
                             $border = 'rgba(72,199,142,0.4)';
                             $color = 'var(--accent-green)';
-                            $icon = '✅';
+                            $icon = icon('check', 14);
                         } elseif ($isThisSelected && !$isThisCorrect) {
                             $bg = 'rgba(255,56,96,0.15)';
                             $border = 'rgba(255,56,96,0.4)';
                             $color = 'var(--accent-red, #ff3860)';
-                            $icon = '❌';
+                            $icon = icon('x', 14);
                         } else {
                             $bg = 'rgba(255,255,255,0.03)';
                             $border = 'rgba(255,255,255,0.08)';

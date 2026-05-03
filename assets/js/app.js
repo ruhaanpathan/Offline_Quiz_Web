@@ -1,5 +1,5 @@
 /**
- * QuizLAN — Common JS Utilities
+ * LANparty — Common JS Utilities
  */
 const QuizLAN = {
     toast(message, type = 'info', duration = 3000) {
@@ -33,4 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
     QuizLAN.initFlash();
     document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('active'); }));
     document.querySelectorAll('.modal-close').forEach(b => b.addEventListener('click', () => b.closest('.modal-overlay').classList.remove('active')));
+    // Close profile dropdown on outside click
+    document.addEventListener('click', e => {
+        const menu = document.getElementById('profileMenu');
+        const toggle = document.querySelector('.profile-toggle');
+        if (menu && toggle && !toggle.contains(e.target) && !menu.contains(e.target)) {
+            menu.classList.remove('active');
+        }
+    });
 });

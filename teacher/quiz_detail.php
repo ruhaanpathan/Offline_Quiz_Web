@@ -100,12 +100,18 @@ require_once __DIR__ . '/../includes/header.php';
             <h1><?= sanitize($quiz['title']) ?> — Full Detail</h1>
             <p style="color:var(--text-muted);"><?= sanitize($quiz['class_name']) ?> • <?= sanitize($quiz['subject']) ?> • Code: <?= sanitize($quiz['quiz_code']) ?> • <?= $totalStudents ?> students</p>
         </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="/teacher/ajax/export_csv.php?quiz_id=<?= $quizId ?>&type=results" class="btn btn-outline btn-sm">Results CSV</a>
+            <a href="/teacher/ajax/export_csv.php?quiz_id=<?= $quizId ?>&type=attendance" class="btn btn-outline btn-sm">Attendance CSV</a>
+            <a href="/teacher/ajax/export_csv.php?quiz_id=<?= $quizId ?>&type=answers" class="btn btn-outline btn-sm">Answers CSV</a>
+            <button onclick="window.print()" class="btn btn-outline btn-sm">Print / PDF</button>
+        </div>
     </div>
 
     <!-- Attendance -->
     <div class="card" style="margin-bottom:24px;">
         <div class="card-header">
-            <h3>📋 Attendance</h3>
+            <h3>Attendance</h3>
             <div style="display:flex;gap:12px;">
                 <span style="display:flex;align-items:center;gap:6px;font-size:0.85rem;"><span style="width:10px;height:10px;border-radius:50%;background:var(--accent-green);display:inline-block;"></span> Present: <strong><?= $presentCount ?></strong></span>
                 <span style="display:flex;align-items:center;gap:6px;font-size:0.85rem;"><span style="width:10px;height:10px;border-radius:50%;background:#ff3860;display:inline-block;"></span> Absent: <strong><?= $absentCount ?></strong></span>
@@ -117,7 +123,7 @@ require_once __DIR__ . '/../includes/header.php';
                 $isPresent = in_array($es['id'], $attendedIds);
             ?>
             <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;background:<?= $isPresent ? 'rgba(72,199,142,0.1)' : 'rgba(255,56,96,0.08)' ?>;border:1px solid <?= $isPresent ? 'rgba(72,199,142,0.2)' : 'rgba(255,56,96,0.15)' ?>;font-size:0.85rem;">
-                <span style="font-size:0.9rem;"><?= $isPresent ? '✅' : '❌' ?></span>
+                <span style="font-size:0.9rem;"><?= $isPresent ? '' : '' ?></span>
                 <div>
                     <div style="font-weight:600;color:<?= $isPresent ? 'var(--text-primary)' : 'var(--text-muted)' ?>;"><?= sanitize($es['name']) ?></div>
                     <div style="font-size:0.75rem;color:var(--text-muted);"><?= sanitize($es['enrollment_no']) ?></div>
@@ -129,7 +135,7 @@ require_once __DIR__ . '/../includes/header.php';
 
     <!-- Student Rankings -->
     <div class="card" style="margin-bottom:24px;">
-        <div class="card-header"><h3>🏆 Student Rankings</h3></div>
+        <div class="card-header"><h3>Student Rankings</h3></div>
         <div style="overflow-x:auto;">
             <table class="table">
                 <thead>
@@ -148,10 +154,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php foreach ($students as $rank => $s): ?>
                     <tr>
                         <td>
-                            <?php if ($rank === 0): ?>🥇
-                            <?php elseif ($rank === 1): ?>🥈
-                            <?php elseif ($rank === 2): ?>🥉
-                            <?php else: echo $rank + 1; endif; ?>
+                            <?php if ($rank === 0): ?>                            <?php elseif ($rank === 1): ?>                            <?php elseif ($rank === 2): ?>                            <?php else: echo $rank + 1; endif; ?>
                         </td>
                         <td><strong><?= sanitize($s['name']) ?></strong></td>
                         <td style="color:var(--text-muted);font-size:0.85rem;"><?= sanitize($s['enrollment_no']) ?></td>
@@ -190,7 +193,7 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
 
     <!-- Question-by-Question Breakdown -->
-    <h2 style="margin-bottom:16px;">📝 Question-by-Question Breakdown</h2>
+    <h2 style="margin-bottom:16px;">Question-by-Question Breakdown</h2>
 
     <?php foreach ($questions as $i => $q):
         $correct = $q['correct_option'];
@@ -209,7 +212,7 @@ require_once __DIR__ . '/../includes/header.php';
                     </span>
                     <div>
                         <div style="font-weight:600;font-size:1rem;line-height:1.5;"><?= sanitize($q['question_text']) ?></div>
-                        <span style="font-size:0.75rem;color:var(--text-muted);">📂 <?= sanitize($q['topic_name']) ?> • ⏱ <?= $q['time_limit_seconds'] ?>s</span>
+                        <span style="font-size:0.75rem;color:var(--text-muted);"><?= sanitize($q['topic_name']) ?> • ⏱ <?= $q['time_limit_seconds'] ?>s</span>
                     </div>
                 </div>
                 <div style="text-align:right;flex-shrink:0;margin-left:16px;">
@@ -230,7 +233,7 @@ require_once __DIR__ . '/../includes/header.php';
                         $bg = 'rgba(72,199,142,0.12)';
                         $border = 'rgba(72,199,142,0.3)';
                         $barColor = 'var(--accent-green)';
-                        $icon = '✅';
+                        $icon = '';
                     } elseif ($count > 0) {
                         $bg = 'rgba(255,56,96,0.06)';
                         $border = 'rgba(255,56,96,0.15)';
@@ -263,7 +266,7 @@ require_once __DIR__ . '/../includes/header.php';
             <!-- Who picked what -->
             <details style="margin-top:8px;">
                 <summary style="cursor:pointer;color:var(--accent-blue);font-size:0.85rem;font-weight:600;padding:4px 0;">
-                    👥 Show individual student responses
+                    Show individual student responses
                 </summary>
                 <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;">
                     <?php foreach ($students as $s):

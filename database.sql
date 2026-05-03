@@ -1,5 +1,5 @@
 -- ============================================
--- QuizLAN Database Schema
+-- LANparty Database Schema
 -- Offline-First College Quiz Platform
 -- ============================================
 

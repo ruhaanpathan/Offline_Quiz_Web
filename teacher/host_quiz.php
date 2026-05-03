@@ -96,7 +96,7 @@ $extraScripts = '<script src="/assets/js/qrcode.min.js"></script>';
     <!-- Completed Phase -->
     <div id="completedPhase" style="display:<?= $quiz['status']==='completed'?'block':'none' ?>">
         <div class="card" style="text-align:center;padding:40px;">
-            <div style="font-size:3rem;margin-bottom:16px;">🎉</div>
+            <div style="font-size:3rem;margin-bottom:16px;"></div>
             <h2>Quiz Completed!</h2>
             <p style="color:var(--text-secondary);margin:12px 0 24px;">View the detailed report below.</p>
             <a href="/teacher/quiz_report.php?id=<?= $quizId ?>" class="btn btn-primary btn-lg">View Report</a>
@@ -177,11 +177,11 @@ function showQuestion(idx) {
         const isCorrect = q.correct_option === opt;
         return `<div style="padding:14px 18px;background:var(--bg-glass);border:1px solid var(--border-glass);border-radius:var(--radius-sm);${isCorrect?'border-color:var(--accent-green);':''}">
             <strong>${opt.toUpperCase()}.</strong> ${q['option_' + opt]}
-            ${isCorrect ? ' ✅' : ''}
+            ${isCorrect ? ' ' : ''}
         </div>`;
     }).join('');
     if (idx >= QUESTIONS.length - 1) {
-        document.getElementById('nextBtn').textContent = 'End Quiz 🏁';
+        document.getElementById('nextBtn').textContent = 'End Quiz ';
     }
     startCountdown(q.time_limit_seconds);
     // Reset stats

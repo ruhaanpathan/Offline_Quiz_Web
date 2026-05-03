@@ -1,6 +1,6 @@
 <?php
 /**
- * QuizLAN — Auth Middleware
+ * LANparty — Auth Middleware
  * Include this at the top of any protected page.
  * Usage:
  *   require_once __DIR__ . '/../includes/auth_check.php';

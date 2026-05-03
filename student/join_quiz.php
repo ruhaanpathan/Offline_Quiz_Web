@@ -12,7 +12,7 @@ require_once __DIR__ . '/../includes/header.php';
 
 <div class="container page-wrapper animate-fade">
     <div style="max-width:500px;margin:40px auto;text-align:center;">
-        <div style="font-size:3rem;margin-bottom:16px;">🎯</div>
+        <div style="font-size:3rem;margin-bottom:16px;"></div>
         <h1 style="margin-bottom:8px;">Join a Quiz</h1>
         <p style="color:var(--text-secondary);margin-bottom:32px;">Enter the 4-digit code shown by your teacher</p>
 

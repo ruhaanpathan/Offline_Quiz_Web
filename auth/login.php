@@ -13,7 +13,7 @@ $flash = getFlash();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login LANparty</title>
+    <title>Login — LANparty</title>
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 
@@ -21,7 +21,7 @@ $flash = getFlash();
     <div class="auth-wrapper">
         <div class="auth-card animate-fade">
             <div class="auth-logo">
-                <div class="logo-icon">⚡</div>
+                <img src="/assets/retrolan.jpg" alt="LANparty" style="width:48px;height:48px;border-radius:10px;object-fit:cover;">
                 <h1>LANparty</h1>
                 <p class="auth-subtitle">Sign in to continue</p>
             </div>

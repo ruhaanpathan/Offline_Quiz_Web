@@ -16,7 +16,7 @@ $flash = getFlash();
 <div class="auth-wrapper">
     <div class="auth-card animate-fade">
         <div class="auth-logo">
-            <div class="logo-icon">⚡</div>
+            <img src="/assets/retrolan.jpg" alt="LANparty" style="width:48px;height:48px;border-radius:10px;object-fit:cover;">
             <h1>Create Account</h1>
             <p class="auth-subtitle">Register as a Teacher</p>
         </div>

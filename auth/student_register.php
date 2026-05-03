@@ -20,7 +20,7 @@ $flash = getFlash();
     <div class="auth-wrapper">
         <div class="auth-card animate-fade">
             <div class="auth-logo">
-                <div class="logo-icon">⚡</div>
+                <img src="/assets/retrolan.jpg" alt="LANparty" style="width:48px;height:48px;border-radius:10px;object-fit:cover;">
                 <h1>LANparty</h1>
                 <p class="auth-subtitle">Student Registration</p>
             </div>
@@ -30,7 +30,7 @@ $flash = getFlash();
             <?php endif; ?>
 
             <div style="background:rgba(102,126,234,0.1);border:1px solid rgba(102,126,234,0.2);border-radius:10px;padding:14px;margin-bottom:20px;font-size:0.85rem;color:var(--text-secondary);">
-                📋 Your teacher must add your enrollment number to a class first. If you get an error, ask your teacher to add you.
+                Your teacher must add your enrollment number to a class first. If you get an error, ask your teacher to add you.
             </div>
 
             <form method="POST" action="/auth/process_auth.php">

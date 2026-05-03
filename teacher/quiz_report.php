@@ -52,7 +52,7 @@ require_once __DIR__ . '/../includes/header.php';
 <div class="container page-wrapper animate-fade">
     <div class="page-header">
         <div>
-            <h1>📊 <?= sanitize($quiz['title']) ?></h1>
+            <h1><?= sanitize($quiz['title']) ?></h1>
             <div class="breadcrumb"><a href="/teacher/dashboard.php">Dashboard</a> / <a href="/teacher/class_detail.php?id=<?= $quiz['class_id'] ?>"><?= sanitize($quiz['class_name']) ?></a> / Report</div>
         </div>
         <span class="badge badge-blue" style="font-size:0.9rem;padding:8px 16px;">Code: <?= $quiz['quiz_code'] ?></span>
@@ -60,10 +60,10 @@ require_once __DIR__ . '/../includes/header.php';
 
     <!-- Overview Stats -->
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px;">
-        <div class="stat-card"><div class="stat-icon blue">👥</div><div class="stat-info"><h4>Students</h4><div class="stat-value"><?= $totalStudents ?></div></div></div>
-        <div class="stat-card"><div class="stat-icon green">📊</div><div class="stat-info"><h4>Avg Accuracy</h4><div class="stat-value"><?= $avgScore ?>%</div></div></div>
-        <div class="stat-card"><div class="stat-icon purple">❓</div><div class="stat-info"><h4>Questions</h4><div class="stat-value"><?= $totalQuestions ?></div></div></div>
-        <div class="stat-card"><div class="stat-icon yellow">📑</div><div class="stat-info"><h4>Topics</h4><div class="stat-value"><?= count($topics) ?></div></div></div>
+        <div class="stat-card"><div class="stat-icon blue"><?= icon('users') ?></div><div class="stat-info"><h4>Students</h4><div class="stat-value"><?= $totalStudents ?></div></div></div>
+        <div class="stat-card"><div class="stat-icon green"><?= icon('check-circle') ?></div><div class="stat-info"><h4>Avg Accuracy</h4><div class="stat-value"><?= $avgScore ?>%</div></div></div>
+        <div class="stat-card"><div class="stat-icon purple"><?= icon('file-text') ?></div><div class="stat-info"><h4>Questions</h4><div class="stat-value"><?= $totalQuestions ?></div></div></div>
+        <div class="stat-card"><div class="stat-icon yellow"><?= icon('tag') ?></div><div class="stat-info"><h4>Topics</h4><div class="stat-value"><?= count($topics) ?></div></div></div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
@@ -89,10 +89,10 @@ require_once __DIR__ . '/../includes/header.php';
         <!-- Weak/Strong Topics -->
         <div>
             <div class="card" style="margin-bottom:16px;">
-                <div class="card-header"><h3>⚠️ Weak Topics (&lt;50%)</h3></div>
+                <div class="card-header"><h3>Weak Topics (&lt;50%)</h3></div>
                 <?php $weak = array_filter($topics, fn($t) => $t['accuracy'] < 50); ?>
                 <?php if (empty($weak)): ?>
-                    <p style="color:var(--accent-green);">🎉 No weak topics! All above 50%.</p>
+                    <p style="color:var(--accent-green);">No weak topics! All above 50%.</p>
                 <?php else: ?>
                     <?php foreach ($weak as $t): ?>
                     <div style="padding:8px 0;border-bottom:1px solid var(--border-glass);display:flex;justify-content:space-between;">
@@ -103,7 +103,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <?php endif; ?>
             </div>
             <div class="card">
-                <div class="card-header"><h3>✅ Strong Topics (&gt;80%)</h3></div>
+                <div class="card-header"><h3>Strong Topics (&gt;80%)</h3></div>
                 <?php $strong = array_filter($topics, fn($t) => $t['accuracy'] >= 80); ?>
                 <?php if (empty($strong)): ?>
                     <p style="color:var(--text-muted);">No topics above 80% yet.</p>
@@ -121,7 +121,7 @@ require_once __DIR__ . '/../includes/header.php';
 
     <!-- Student Results Table -->
     <div class="card">
-        <div class="card-header"><h3>🏆 Student Rankings</h3></div>
+        <div class="card-header"><h3>Student Rankings</h3></div>
         <div class="table-wrapper">
         <table>
             <thead><tr><th>Rank</th><th>Name</th><th>Enrollment</th><th>Score</th><th>Accuracy</th><th>Action</th></tr></thead>

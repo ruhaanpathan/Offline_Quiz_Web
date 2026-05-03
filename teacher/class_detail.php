@@ -47,9 +47,9 @@ require_once __DIR__ . '/../includes/header.php';
 
     <!-- Stats -->
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:28px;">
-        <div class="stat-card"><div class="stat-icon blue">👥</div><div class="stat-info"><h4>Students</h4><div class="stat-value"><?= count($students) ?></div></div></div>
-        <div class="stat-card"><div class="stat-icon purple">📝</div><div class="stat-info"><h4>Quizzes</h4><div class="stat-value"><?= count($quizzes) ?></div></div></div>
-        <div class="stat-card"><div class="stat-icon green">📑</div><div class="stat-info"><h4>Topics</h4><div class="stat-value"><?= count($topics) ?></div></div></div>
+        <div class="stat-card"><div class="stat-icon blue"><?= icon('users') ?></div><div class="stat-info"><h4>Students</h4><div class="stat-value"><?= count($students) ?></div></div></div>
+        <div class="stat-card"><div class="stat-icon purple"><?= icon('file-text') ?></div><div class="stat-info"><h4>Quizzes</h4><div class="stat-value"><?= count($quizzes) ?></div></div></div>
+        <div class="stat-card"><div class="stat-icon green"><?= icon('tag') ?></div><div class="stat-info"><h4>Topics</h4><div class="stat-value"><?= count($topics) ?></div></div></div>
     </div>
 
     <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:24px;">
@@ -57,7 +57,7 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="card">
             <div class="card-header"><h3>Students (<?= count($students) ?>)</h3></div>
             <?php if (empty($students)): ?>
-                <div class="empty-state"><div class="empty-icon">👥</div><h3>No students yet</h3><p>Add students to this class.</p></div>
+                <div class="empty-state"><div class="empty-icon"></div><h3>No students yet</h3><p>Add students to this class.</p></div>
             <?php else: ?>
                 <div class="table-wrapper">
                 <table>

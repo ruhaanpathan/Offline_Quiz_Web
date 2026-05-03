@@ -1,10 +1,10 @@
 @echo off
-title QuizLAN Server
+title LANparty Server
 color 0A
 
 echo.
 echo  ========================================
-echo     QuizLAN (By Ruhaan Pathan)
+echo     LANparty (By Ruhaan Pathan)
 echo  ========================================
 echo.
 

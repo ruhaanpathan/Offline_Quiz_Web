@@ -36,7 +36,7 @@ require_once __DIR__ . '/../includes/header.php';
 <div class="container page-wrapper animate-fade">
     <div class="page-header">
         <div>
-            <h1>📋 Attendance — <?= sanitize($class['class_name']) ?></h1>
+            <h1>Attendance — <?= sanitize($class['class_name']) ?></h1>
             <div class="breadcrumb"><a href="/teacher/dashboard.php">Dashboard</a> / <a href="/teacher/class_detail.php?id=<?= $classId ?>"><?= sanitize($class['class_name']) ?></a> / Attendance</div>
         </div>
     </div>
@@ -63,7 +63,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <td><span class="badge badge-blue"><?= sanitize($s['enrollment_no']) ?></span></td>
                     <?php foreach ($quizList as $q): ?>
                         <?php $isPresent = in_array($s['id'], $attendanceMap[$q['id']] ?? []); if ($isPresent) $present++; ?>
-                        <td style="text-align:center;"><?= $isPresent ? '✅' : '❌' ?></td>
+                        <td style="text-align:center;"><?= $isPresent ? '' : '' ?></td>
                     <?php endforeach; ?>
                     <td><strong><?= $present ?>/<?= count($quizList) ?></strong></td>
                     <td><span class="badge <?= percentage($present, count($quizList))>=75?'badge-green':'badge-red' ?>"><?= percentage($present, count($quizList)) ?>%</span></td>

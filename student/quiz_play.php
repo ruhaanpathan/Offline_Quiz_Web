@@ -37,7 +37,7 @@ require_once __DIR__ . '/../includes/header.php';
         <h2>Waiting for teacher to start...</h2>
         <p style="color:var(--text-secondary);margin-top:8px;"><?= sanitize($quiz['title']) ?> • <?= sanitize($quiz['class_name']) ?></p>
         <div style="margin-top:24px;">
-            <span class="badge badge-green" style="font-size:1rem;padding:8px 20px;">You're in! 🎉</span>
+            <span class="badge badge-green" style="font-size:1rem;padding:8px 20px;">You're in! </span>
         </div>
     </div>
 
@@ -59,7 +59,7 @@ require_once __DIR__ . '/../includes/header.php';
 
     <!-- Results Phase -->
     <div id="resultsPhase" style="display:none;text-align:center;padding:40px 0;">
-        <div style="font-size:3rem;margin-bottom:16px;">🎉</div>
+        <div style="font-size:3rem;margin-bottom:16px;"></div>
         <h2>Quiz Completed!</h2>
         <div class="card" style="max-width:400px;margin:24px auto;">
             <div style="font-size:3rem;font-weight:800;color:var(--accent-green);" id="finalScore">0/0</div>
@@ -105,7 +105,7 @@ function showQuestion(q) {
     document.getElementById('questionPhase').style.display = 'block';
     document.getElementById('qNum').textContent = `Q${lastQIdx + 1} of ${TOTAL_Q}`;
     document.getElementById('questionText').textContent = q.question_text;
-    document.getElementById('topicLabel').textContent = '📎 ' + q.topic_name;
+    document.getElementById('topicLabel').textContent = '' + q.topic_name;
     document.getElementById('feedback').style.display = 'none';
 
     const colors = { a: '#4F8EF7', b: '#8B5CF6', c: '#10B981', d: '#F59E0B' };
@@ -151,7 +151,7 @@ async function submitAnswer(selected, correctOpt, questionId) {
     fb.style.display = 'block';
     fb.style.background = isCorrect ? 'var(--accent-green-glow)' : 'rgba(239,68,68,0.1)';
     fb.style.color = isCorrect ? 'var(--accent-green)' : 'var(--accent-red)';
-    fb.textContent = isCorrect ? '✅ Correct!' : '❌ Incorrect — Answer: ' + correctOpt.toUpperCase();
+    fb.textContent = isCorrect ? 'Correct!' : 'Incorrect — Answer: ' + correctOpt.toUpperCase();
 
     const data = new FormData();
     data.append('attempt_id', ATTEMPT_ID);
@@ -183,7 +183,7 @@ async function showResults() {
         document.getElementById('finalScore').textContent = res.correct + '/' + res.total;
         document.getElementById('finalPercent').textContent = (res.total > 0 ? Math.round(res.correct/res.total*100) : 0) + '% accuracy';
         if (res.leaderboard && res.leaderboard.length) {
-            document.getElementById('leaderboard').innerHTML = '<div class="card"><h3 style="margin-bottom:16px;">🏆 Leaderboard</h3>' +
+            document.getElementById('leaderboard').innerHTML = '<div class="card"><h3 style="margin-bottom:16px;">Leaderboard</h3>' +
                 res.leaderboard.map((s, i) =>
                     `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-glass);${s.is_you?'color:var(--accent-blue);font-weight:700;':''}">
                         <span>${i+1}. ${s.name}</span><span>${s.score}/${s.total}</span>
