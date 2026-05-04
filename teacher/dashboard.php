@@ -52,12 +52,30 @@ foreach ($classes as $c) {
     $classChartData[] = ['name' => $c['class_name'], 'students' => (int)$c['student_count'], 'quizzes' => (int)$c['quiz_count']];
 }
 
+// Chart: Topic-wise accuracy across all quizzes (teacher's classes)
+$topicAnalysis = $pdo->prepare("
+    SELECT tp.topic_name,
+           COUNT(sa.id) as total_answers,
+           SUM(sa.is_correct) as correct_answers,
+           ROUND(SUM(sa.is_correct) / COUNT(sa.id) * 100) as accuracy
+    FROM student_answers sa
+    JOIN questions qs ON sa.question_id = qs.id
+    JOIN topics tp ON qs.topic_id = tp.id
+    JOIN quiz_attempts qa ON sa.attempt_id = qa.id
+    JOIN quizzes q ON qa.quiz_id = q.id
+    WHERE q.teacher_id = ? AND q.status = 'completed'
+    GROUP BY tp.id, tp.topic_name
+    ORDER BY accuracy ASC
+");
+$topicAnalysis->execute([$tid]);
+$topicChartData = $topicAnalysis->fetchAll();
+
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container page-wrapper animate-fade">
+<div class="page-wrapper animate-fade">
     <div class="page-header">
-        <h1>Welcome back, <?= sanitize(getCurrentUserName()) ?> </h1>
+        <h1>Welcome back, <?= sanitize(getCurrentUserName()) ?></h1>
     </div>
 
     <!-- Stats -->
@@ -91,17 +109,17 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
 
     <!-- Charts -->
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-bottom:32px;">
+    <div style="display:grid;grid-template-columns:3fr 2fr;gap:24px;margin-bottom:32px;">
         <div class="card">
             <div class="card-header"><h3>Class Average Score Trend</h3></div>
-            <div style="position:relative;height:250px;">
+            <div style="position:relative;height:300px;padding:8px 4px 0;">
                 <canvas id="scoreTrendChart"></canvas>
             </div>
         </div>
         <div class="card">
-            <div class="card-header"><h3>Students per Class</h3></div>
-            <div style="position:relative;height:250px;">
-                <canvas id="classPieChart"></canvas>
+            <div class="card-header"><h3>Topic Analysis</h3></div>
+            <div style="position:relative;height:<?= max(280, count($topicChartData) * 40) ?>px;padding:8px 4px 0;">
+                <canvas id="topicAnalysisChart"></canvas>
             </div>
         </div>
     </div>
@@ -117,7 +135,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="empty-state"><div class="empty-icon"></div><h3>No classes yet</h3><p>Create your first class to get started.</p></div>
             <?php else: ?>
                 <?php foreach ($classes as $c): ?>
-                <a href="/teacher/class_detail.php?id=<?= $c['id'] ?>" style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-glass);color:var(--text-primary);">
+                <a href="/teacher/class_detail.php?id=<?= $c['id'] ?>" style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);color:var(--text-primary);">
                     <div>
                         <strong><?= sanitize($c['class_name']) ?></strong>
                         <div style="font-size:0.8rem;color:var(--text-muted);"><?= sanitize($c['subject']) ?> <?= $c['section'] ? '• ' . sanitize($c['section']) : '' ?></div>
@@ -140,7 +158,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="empty-state"><div class="empty-icon"></div><h3>No quizzes yet</h3><p>Create a quiz from a class page.</p></div>
             <?php else: ?>
                 <?php foreach ($recent as $q): ?>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-glass);">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);">
                     <div>
                         <strong><?= sanitize($q['title']) ?></strong>
                         <div style="font-size:0.8rem;color:var(--text-muted);"><?= sanitize($q['class_name']) ?> • <?= sanitize($q['subject']) ?></div>
@@ -175,81 +193,186 @@ require_once __DIR__ . '/../includes/header.php';
 
 <script src="/assets/js/chart.min.js"></script>
 <script>
+// Premium color palette
 const chartColors = ['#4F8EF7','#10B981','#8B5CF6','#F59E0B','#EF4444','#EC4899','#06B6D4','#84CC16'];
 
-// Score Trend Line Chart
+// Global Chart.js defaults for clean light theme
+Chart.defaults.font.family = "'Montserrat', sans-serif";
+Chart.defaults.font.weight = 500;
+Chart.defaults.plugins.tooltip.padding = 12;
+Chart.defaults.plugins.tooltip.cornerRadius = 10;
+Chart.defaults.plugins.tooltip.displayColors = true;
+Chart.defaults.plugins.tooltip.boxPadding = 6;
+
+// Score Trend — Area/Line Chart
 const trendCtx = document.getElementById('scoreTrendChart');
 if (trendCtx) {
     const trendData = <?= json_encode($chartData) ?>;
+    const ctx2d = trendCtx.getContext('2d');
+
+    // Gradient fill for area
+    const gradient = ctx2d.createLinearGradient(0, 0, 0, 250);
+    gradient.addColorStop(0, 'rgba(79, 142, 247, 0.25)');
+    gradient.addColorStop(0.5, 'rgba(79, 142, 247, 0.08)');
+    gradient.addColorStop(1, 'rgba(79, 142, 247, 0.0)');
+
     new Chart(trendCtx, {
         type: 'line',
         data: {
-            labels: trendData.map(d => d.title.length > 15 ? d.title.substring(0,15)+'...' : d.title),
+            labels: trendData.map(d => d.title.length > 12 ? d.title.substring(0,12)+'…' : d.title),
             datasets: [{
-                label: 'Avg Score %',
+                label: 'Avg Score',
                 data: trendData.map(d => d.avg_score),
                 borderColor: '#4F8EF7',
-                backgroundColor: 'rgba(79,142,247,0.1)',
+                backgroundColor: gradient,
                 fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#4F8EF7',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
+                tension: 0.45,
+                borderWidth: 3,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#4F8EF7',
+                pointBorderWidth: 2.5,
                 pointRadius: 5,
-                pointHoverRadius: 7
+                pointHoverRadius: 8,
+                pointHoverBorderWidth: 3,
+                pointHoverBackgroundColor: '#4F8EF7'
             },{
                 label: 'Participants',
                 data: trendData.map(d => d.participants),
                 borderColor: '#8B5CF6',
-                backgroundColor: 'rgba(139,92,246,0.05)',
+                backgroundColor: 'transparent',
                 fill: false,
-                tension: 0.4,
-                borderDash: [5,5],
-                pointBackgroundColor: '#8B5CF6',
+                tension: 0.45,
+                borderWidth: 2,
+                borderDash: [6, 4],
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#8B5CF6',
+                pointBorderWidth: 2,
                 pointRadius: 4,
+                pointHoverRadius: 7,
                 yAxisID: 'y1'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { right: window.innerWidth < 768 ? 8 : 0 } },
             interaction: { intersect: false, mode: 'index' },
+            animation: {
+                duration: 800,
+                easing: 'easeOutQuart'
+            },
             plugins: {
-                legend: { labels: { color: '#9aa0a8', font: { size: 11 } } },
-                tooltip: { backgroundColor: '#1a1d27', titleColor: '#e8eaed', bodyColor: '#9aa0a8', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1 }
+                legend: {
+                    labels: {
+                        color: '#6B7280',
+                        font: { size: 11, weight: 600 },
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        padding: 20
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#2D2A43',
+                    titleColor: '#fff',
+                    titleFont: { size: 13, weight: 700 },
+                    bodyColor: '#d1d5db',
+                    bodyFont: { size: 12 },
+                    borderColor: 'rgba(255,255,255,0.1)',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(ctx) {
+                            if (ctx.dataset.yAxisID === 'y1') return ' ' + ctx.parsed.y + ' students';
+                            return ' ' + ctx.parsed.y + '%';
+                        }
+                    }
+                }
             },
             scales: {
-                x: { ticks: { color: '#5f6572', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
-                y: { min: 0, max: 100, ticks: { color: '#5f6572', callback: v => v+'%' }, grid: { color: 'rgba(255,255,255,0.04)' } },
-                y1: { position: 'right', ticks: { color: '#5f6572' }, grid: { display: false } }
+                x: {
+                    ticks: { color: '#9CA3AF', font: { size: 10, weight: 500 } },
+                    grid: { display: false },
+                    border: { display: false }
+                },
+                y: {
+                    min: 0, max: 100,
+                    ticks: { color: '#9CA3AF', font: { size: 10 }, callback: v => v + '%', stepSize: 25 },
+                    grid: { color: '#F3F4F6', lineWidth: 1 },
+                    border: { display: false, dash: [4,4] }
+                },
+                y1: {
+                    position: 'right',
+                    ticks: { color: '#C4B5FD', font: { size: 10 }, stepSize: 1 },
+                    grid: { display: false },
+                    border: { display: false }
+                }
             }
         }
     });
 }
 
-// Class Doughnut Chart
-const pieCtx = document.getElementById('classPieChart');
-if (pieCtx) {
-    const classData = <?= json_encode($classChartData) ?>;
-    new Chart(pieCtx, {
-        type: 'doughnut',
+// Topic Analysis — Horizontal Bar Chart
+const topicCtx = document.getElementById('topicAnalysisChart');
+if (topicCtx) {
+    const topics = <?= json_encode(array_map(fn($t) => [
+        'name' => $t['topic_name'],
+        'accuracy' => (int)$t['accuracy'],
+        'correct' => (int)$t['correct_answers'],
+        'total' => (int)$t['total_answers']
+    ], $topicChartData)) ?>;
+
+    new Chart(topicCtx, {
+        type: 'bar',
         data: {
-            labels: classData.map(d => d.name),
+            labels: topics.map(t => { const max = window.innerWidth < 768 ? 14 : 30; return t.name.length > max ? t.name.substring(0,max)+'…' : t.name; }),
             datasets: [{
-                data: classData.map(d => d.students),
-                backgroundColor: chartColors.slice(0, classData.length),
-                borderColor: '#0f1117',
-                borderWidth: 3,
-                hoverOffset: 8
+                label: 'Accuracy',
+                data: topics.map(t => t.accuracy),
+                backgroundColor: topics.map(t =>
+                    t.accuracy >= 70 ? '#10B981' :
+                    t.accuracy >= 40 ? '#FBBF24' : '#EF4444'
+                ),
+                borderRadius: 6,
+                borderSkipped: false,
+                barPercentage: 0.55,
+                categoryPercentage: 0.8
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '65%',
+            indexAxis: 'y',
+            layout: { padding: { right: window.innerWidth < 768 ? 10 : 0 } },
+            animation: { duration: 800, easing: 'easeOutQuart' },
             plugins: {
-                legend: { position: 'bottom', labels: { color: '#9aa0a8', padding: 12, font: { size: 11 }, usePointStyle: true, pointStyle: 'circle' } },
-                tooltip: { backgroundColor: '#1a1d27', titleColor: '#e8eaed', bodyColor: '#9aa0a8', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1 }
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#2D2A43',
+                    titleColor: '#fff',
+                    titleFont: { size: 13, weight: 700 },
+                    bodyColor: '#d1d5db',
+                    bodyFont: { size: 12 },
+                    borderColor: 'rgba(255,255,255,0.1)',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(ctx) {
+                            const t = topics[ctx.dataIndex];
+                            return ' ' + t.accuracy + '% (' + t.correct + '/' + t.total + ' correct)';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    min: 0, max: 100,
+                    ticks: { color: '#9CA3AF', font: { size: 10 }, callback: v => v + '%', stepSize: 25 },
+                    grid: { color: '#F3F4F6' },
+                    border: { display: false }
+                },
+                y: {
+                    ticks: { color: '#4B5563', font: { size: 11, weight: 600 } },
+                    grid: { display: false },
+                    border: { display: false }
+                }
             }
         }
     });

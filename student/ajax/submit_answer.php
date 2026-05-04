@@ -43,19 +43,36 @@ $att = $pdo->prepare("SELECT id FROM quiz_attempts WHERE id = ? AND student_id =
 $att->execute([$attemptId, $sid]);
 if (!$att->fetch()) { jsonResponse(false, 'Invalid attempt.'); }
 
-// Get correct answer
-$qStmt = $pdo->prepare("SELECT correct_option FROM questions WHERE id = ?");
+// Get correct answer + time limit
+$qStmt = $pdo->prepare("SELECT qs.correct_option, qs.time_limit_seconds, qs.quiz_id FROM questions qs WHERE qs.id = ?");
 $qStmt->execute([$questionId]);
 $q = $qStmt->fetch();
 if (!$q) { jsonResponse(false, 'Question not found.'); }
 
+// Server-side time check: reject answer if question time has expired (with 3s grace period for network lag)
+$timeCheck = $pdo->prepare("
+    SELECT TIMESTAMPDIFF(SECOND, phase_changed_at, NOW()) as elapsed 
+    FROM quiz_live_state WHERE quiz_id = ?
+");
+$timeCheck->execute([$q['quiz_id']]);
+$tc = $timeCheck->fetch();
+if ($tc && (int)$tc['elapsed'] > ((int)$q['time_limit_seconds'] + 3)) {
+    jsonResponse(false, "Time's up! Answer not accepted.", ['time_expired' => true]);
+}
+
 $isCorrect = ($selected === $q['correct_option']) ? 1 : 0;
 
-// Insert or update answer
+// Insert answer ONLY if not already answered (first answer is final)
 try {
-    $pdo->prepare("INSERT INTO student_answers (attempt_id, question_id, selected_option, is_correct) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE selected_option = VALUES(selected_option), is_correct = VALUES(is_correct)")
+    $check = $pdo->prepare("SELECT id FROM student_answers WHERE attempt_id = ? AND question_id = ?");
+    $check->execute([$attemptId, $questionId]);
+    if ($check->fetch()) {
+        jsonResponse(true, 'Already answered.', ['already_answered' => true]);
+    }
+
+    $pdo->prepare("INSERT INTO student_answers (attempt_id, question_id, selected_option, is_correct) VALUES (?, ?, ?, ?)")
         ->execute([$attemptId, $questionId, $selected, $isCorrect]);
-    jsonResponse(true, 'Answer submitted.');
+    jsonResponse(true, 'Answer submitted.', ['already_answered' => false, 'is_correct' => (bool)$isCorrect]);
 } catch (PDOException $e) {
     jsonResponse(false, 'Error saving answer.');
 }

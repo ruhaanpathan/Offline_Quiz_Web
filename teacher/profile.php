@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container page-wrapper animate-fade">
+<div class="page-wrapper animate-fade">
     <div class="page-header"><h1>My Profile</h1></div>
 
     <div style="display:grid;grid-template-columns:1fr 2fr;gap:24px;">
@@ -75,13 +75,13 @@ require_once __DIR__ . '/../includes/header.php';
             <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:4px;"><?= sanitize($teacher['email']) ?></p>
             <span class="badge badge-blue" style="margin-bottom:20px;">Teacher</span>
 
-            <div style="border-top:1px solid var(--border-glass);padding-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div style="border-top:1px solid var(--border);padding-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div><div style="font-size:1.4rem;font-weight:700;"><?= $totalClasses ?></div><div style="font-size:0.75rem;color:var(--text-muted);">Classes</div></div>
                 <div><div style="font-size:1.4rem;font-weight:700;"><?= $totalStudents ?></div><div style="font-size:0.75rem;color:var(--text-muted);">Students</div></div>
                 <div><div style="font-size:1.4rem;font-weight:700;"><?= $totalQuizzes ?></div><div style="font-size:0.75rem;color:var(--text-muted);">Quizzes</div></div>
                 <div><div style="font-size:1.4rem;font-weight:700;"><?= $totalQs ?></div><div style="font-size:0.75rem;color:var(--text-muted);">Questions</div></div>
             </div>
-            <div style="border-top:1px solid var(--border-glass);padding-top:16px;margin-top:16px;font-size:0.78rem;color:var(--text-muted);">
+            <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:16px;font-size:0.78rem;color:var(--text-muted);">
                 Joined <?= date('M Y', strtotime($teacher['created_at'])) ?>
             </div>
         </div>

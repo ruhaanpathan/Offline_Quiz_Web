@@ -33,7 +33,7 @@ foreach ($quizList as $q) {
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container page-wrapper animate-fade">
+<div class="page-wrapper animate-fade">
     <div class="page-header">
         <div>
             <h1>Attendance — <?= sanitize($class['class_name']) ?></h1>

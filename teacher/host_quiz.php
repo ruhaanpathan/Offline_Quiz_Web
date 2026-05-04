@@ -25,7 +25,7 @@ require_once __DIR__ . '/../includes/header.php';
 $extraScripts = '<script src="/assets/js/qrcode.min.js"></script>';
 ?>
 
-<div class="container page-wrapper animate-fade">
+<div class="page-wrapper animate-fade">
     <div class="page-header">
         <div>
             <h1><?= sanitize($quiz['title']) ?></h1>
@@ -72,7 +72,7 @@ $extraScripts = '<script src="/assets/js/qrcode.min.js"></script>';
                     <h2 id="qText" style="font-size:1.3rem;margin-bottom:24px;"></h2>
                     <div id="optionsDisplay" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"></div>
                 </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border-glass);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">
                     <span id="timerDisplay" style="font-size:1.5rem;font-weight:700;color:var(--accent-yellow);">⏱ 30s</span>
                     <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn">Next Question →</button>
                 </div>
@@ -85,7 +85,7 @@ $extraScripts = '<script src="/assets/js/qrcode.min.js"></script>';
                     <div style="margin-bottom:12px;" class="optBar"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>C</span><span id="statC">0</span></div><div style="background:var(--bg-secondary);border-radius:4px;height:8px;overflow:hidden;"><div id="barC" style="height:100%;background:var(--accent-green);width:0%;transition:width 0.5s;"></div></div></div>
                     <div style="margin-bottom:12px;" class="optBar"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>D</span><span id="statD">0</span></div><div style="background:var(--bg-secondary);border-radius:4px;height:8px;overflow:hidden;"><div id="barD" style="height:100%;background:var(--accent-yellow);width:0%;transition:width 0.5s;"></div></div></div>
                 </div>
-                <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border-glass);">
+                <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
                     <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:var(--text-muted);">Answered</span><span id="answeredCount">0</span></div>
                     <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Total Students</span><span id="totalStudents">0</span></div>
                 </div>
@@ -140,7 +140,7 @@ function startLobbyPoll() {
             document.getElementById('studentCount').textContent = res.students.length + ' joined';
             if (res.students.length > 0) {
                 document.getElementById('lobbyList').innerHTML = res.students.map((s, i) =>
-                    `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-glass);">
+                    `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
                         <div class="user-avatar" style="width:32px;height:32px;font-size:0.75rem;">${s.name.charAt(0).toUpperCase()}</div>
                         <div><strong>${s.name}</strong><div style="font-size:0.75rem;color:var(--text-muted);">${s.enrollment_no}</div></div>
                     </div>`
@@ -175,7 +175,7 @@ function showQuestion(idx) {
     document.getElementById('qText').textContent = q.question_text;
     document.getElementById('optionsDisplay').innerHTML = ['a','b','c','d'].map(opt => {
         const isCorrect = q.correct_option === opt;
-        return `<div style="padding:14px 18px;background:var(--bg-glass);border:1px solid var(--border-glass);border-radius:var(--radius-sm);${isCorrect?'border-color:var(--accent-green);':''}">
+        return `<div style="padding:14px 18px;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);${isCorrect?'border-color:var(--accent-green);':''}">
             <strong>${opt.toUpperCase()}.</strong> ${q['option_' + opt]}
             ${isCorrect ? ' ' : ''}
         </div>`;
@@ -241,7 +241,20 @@ function startStatsPoll() {
 
 // Auto-start lobby poll if status is lobby
 if ('<?= $quiz['status'] ?>' === 'lobby') { startLobbyPoll(); }
-if ('<?= $quiz['status'] ?>' === 'active') { startStatsPoll(); showQuestion(0); }
+if ('<?= $quiz['status'] ?>' === 'active') {
+    // Restore correct question index from DB on page reload
+    (async () => {
+        const res = await QuizLAN.ajax('/teacher/ajax/live_stats.php', { quiz_id: QUIZ_ID, question_index: 0, get_state: 1 });
+        // Fetch live state to get current question index
+        const stateRes = await fetch('/teacher/ajax/get_quiz_state.php?quiz_id=' + QUIZ_ID);
+        const state = await stateRes.json();
+        if (state.success && typeof state.question_index !== 'undefined') {
+            currentQIdx = state.question_index;
+        }
+        showQuestion(currentQIdx);
+        startStatsPoll();
+    })();
+}
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

@@ -32,7 +32,7 @@ $topics = $topicsStmt->fetchAll();
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container page-wrapper animate-fade">
+<div class="page-wrapper animate-fade">
     <div class="page-header">
         <div>
             <h1><?= sanitize($class['class_name']) ?></h1>
@@ -91,7 +91,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="empty-state" style="padding:30px;"><p>No quizzes yet.</p></div>
                 <?php else: ?>
                     <?php foreach ($quizzes as $q): ?>
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border-glass);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);">
                         <div>
                             <strong style="font-size:0.9rem;"><?= sanitize($q['title']) ?></strong>
                             <div style="font-size:0.75rem;color:var(--text-muted);">Code: <?= $q['quiz_code'] ?></div>
@@ -148,7 +148,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="form-text" style="margin-bottom:12px;color:var(--text-muted);font-size:0.8rem;">The student will set their own password when they register on the login page.</div>
                 <button type="submit" class="btn btn-primary btn-block">Add Student</button>
             </form>
-            <hr style="border-color:var(--border-glass);margin:24px 0;">
+            <hr style="border-color:var(--border);margin:24px 0;">
             <h4 style="margin-bottom:12px;font-size:0.95rem;">Bulk Import (CSV)</h4>
             <form id="csvForm" enctype="multipart/form-data">
                 <div class="form-group">

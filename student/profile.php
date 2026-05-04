@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container page-wrapper animate-fade">
+<div class="page-wrapper animate-fade">
     <div class="page-header"><h1>My Profile</h1></div>
 
     <div style="display:grid;grid-template-columns:1fr 2fr;gap:24px;">
@@ -63,13 +63,13 @@ require_once __DIR__ . '/../includes/header.php';
             <span class="badge badge-blue" style="margin-bottom:6px;"><?= sanitize($student['enrollment_no']) ?></span><br>
             <span class="badge badge-purple">Student</span>
 
-            <div style="border-top:1px solid var(--border-glass);padding-top:20px;margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div><div style="font-size:1.4rem;font-weight:700;"><?= $totalClasses ?></div><div style="font-size:0.75rem;color:var(--text-muted);">Classes</div></div>
                 <div><div style="font-size:1.4rem;font-weight:700;"><?= $stats['total'] ?? 0 ?></div><div style="font-size:0.75rem;color:var(--text-muted);">Quizzes</div></div>
                 <div><div style="font-size:1.4rem;font-weight:700;"><?= $accuracy ?>%</div><div style="font-size:0.75rem;color:var(--text-muted);">Accuracy</div></div>
                 <div><div style="font-size:1.4rem;font-weight:700;"><?= $stats['correct'] ?? 0 ?>/<?= $stats['questions'] ?? 0 ?></div><div style="font-size:0.75rem;color:var(--text-muted);">Correct</div></div>
             </div>
-            <div style="border-top:1px solid var(--border-glass);padding-top:16px;margin-top:16px;font-size:0.78rem;color:var(--text-muted);">
+            <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:16px;font-size:0.78rem;color:var(--text-muted);">
                 Joined <?= date('M Y', strtotime($student['created_at'])) ?>
             </div>
         </div>
@@ -83,7 +83,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="empty-state" style="padding:20px;"><p>Not enrolled in any classes yet.</p></div>
                 <?php else: ?>
                     <?php foreach ($classList as $c): ?>
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-glass);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
                         <div>
                             <div style="font-weight:600;font-size:0.9rem;"><?= sanitize($c['class_name']) ?></div>
                             <div style="font-size:0.78rem;color:var(--text-muted);"><?= sanitize($c['subject']) ?></div>

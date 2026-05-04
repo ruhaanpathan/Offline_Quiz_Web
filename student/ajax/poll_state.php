@@ -20,17 +20,54 @@ if (!$quizId) {
 
 // Poll state
 if (!empty($_POST['poll'])) {
-    $state = $pdo->prepare("SELECT * FROM quiz_live_state WHERE quiz_id = ?");
+    // Use TIMESTAMPDIFF to calculate elapsed seconds entirely in MySQL (no timezone mismatch)
+    $state = $pdo->prepare("
+        SELECT *, TIMESTAMPDIFF(SECOND, phase_changed_at, NOW()) as elapsed_seconds 
+        FROM quiz_live_state WHERE quiz_id = ?
+    ");
     $state->execute([$quizId]);
     $s = $state->fetch();
     if (!$s) { jsonResponse(true, '', ['phase' => 'lobby', 'question_index' => 0]); }
 
-    $result = ['phase' => $s['phase'], 'question_index' => $s['current_question_index']];
+    $result = [
+        'phase' => $s['phase'],
+        'question_index' => (int)$s['current_question_index']
+    ];
 
     if ($s['phase'] === 'question') {
         $qStmt = $pdo->prepare("SELECT q.*, t.topic_name FROM questions q JOIN topics t ON q.topic_id = t.id WHERE q.quiz_id = ? ORDER BY q.question_order LIMIT 1 OFFSET ?");
         $qStmt->execute([$quizId, $s['current_question_index']]);
-        $result['question'] = $qStmt->fetch();
+        $question = $qStmt->fetch();
+        // Strip correct answer — never send it to student client
+        $safeQuestion = $question;
+        unset($safeQuestion['correct_option']);
+        $result['question'] = $safeQuestion;
+
+        // Calculate remaining time using MySQL elapsed (no timezone issues)
+        $timeLimit = (int)$question['time_limit_seconds'];
+        $elapsed = (int)($s['elapsed_seconds'] ?? 0);
+        $result['remaining_seconds'] = max(0, $timeLimit - $elapsed);
+        $result['time_limit'] = $timeLimit;
+
+        // Check if this student already answered this question
+        $sid = getCurrentUserId();
+        $attStmt = $pdo->prepare("SELECT id FROM quiz_attempts WHERE quiz_id = ? AND student_id = ?");
+        $attStmt->execute([$quizId, $sid]);
+        $att = $attStmt->fetch();
+        if ($att) {
+            $ansStmt = $pdo->prepare("SELECT selected_option, is_correct FROM student_answers WHERE attempt_id = ? AND question_id = ?");
+            $ansStmt->execute([$att['id'], $question['id']]);
+            $existingAns = $ansStmt->fetch();
+            if ($existingAns) {
+                $result['already_answered'] = true;
+                $result['selected_option'] = $existingAns['selected_option'];
+                $result['was_correct'] = (bool)$existingAns['is_correct'];
+            } else {
+                $result['already_answered'] = false;
+            }
+        } else {
+            $result['already_answered'] = false;
+        }
     }
 
     jsonResponse(true, '', $result);

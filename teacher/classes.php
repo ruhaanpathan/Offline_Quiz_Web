@@ -37,7 +37,7 @@ $classes = $classesList->fetchAll();
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container page-wrapper animate-fade">
+<div class="page-wrapper animate-fade">
     <div class="page-header">
         <div>
             <h1>My Classes</h1>
@@ -61,7 +61,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <form method="POST" style="display:inline;" onclick="event.stopPropagation();">
                         <input type="hidden" name="action" value="delete_class">
                         <input type="hidden" name="class_id" value="<?= $c['id'] ?>">
-                        <button type="submit" class="btn-icon btn btn-outline" onclick="return confirm('Delete this class and all its data?')" title="Delete"></button>
+                        <button type="submit" class="btn-icon btn btn-outline" onclick="return confirm('Delete this class and all its data?')" title="Delete" style="color:var(--accent-red);"><?= icon('trash', 16) ?></button>
                     </form>
                 </div>
                 <div style="display:flex;gap:12px;">

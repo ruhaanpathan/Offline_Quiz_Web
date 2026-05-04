@@ -5,7 +5,7 @@ requireStudent();
 require_once __DIR__ . '/../config/db.php';
 
 $sid = getCurrentUserId();
-$classId = (int)($_GET['id'] ?? 0);
+$classId = (int) ($_GET['id'] ?? 0);
 
 // Verify student is enrolled in this class
 $classStmt = $pdo->prepare("
@@ -66,32 +66,51 @@ foreach ($quizzes as $q) {
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container page-wrapper animate-fade">
+<div class="page-wrapper animate-fade">
     <div class="page-header">
         <div>
-            <a href="/student/dashboard.php" style="color:var(--text-muted);font-size:0.85rem;">← Back to Dashboard</a>
+            <a href="/student/dashboard.php" style="color:var(--text-secondary);font-size:0.85rem;">← Back to
+                Dashboard</a>
             <h1><?= sanitize($class['class_name']) ?></h1>
-            <p style="color:var(--text-muted);"><?= sanitize($class['subject']) ?><?= $class['section'] ? ' • Section ' . sanitize($class['section']) : '' ?> • <?= sanitize($class['teacher_name']) ?></p>
+            <p style="color:var(--text-muted);">
+                <?= sanitize($class['subject']) ?><?= $class['section'] ? ' • Section ' . sanitize($class['section']) : '' ?>
+                • <?= sanitize($class['teacher_name']) ?></p>
         </div>
     </div>
 
     <!-- Stats -->
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:32px;">
-        <a href="#quizHistory" class="stat-card" style="text-decoration:none;color:inherit;cursor:pointer;transition:transform 0.2s;">
+        <a href="#quizHistory" class="stat-card"
+            style="text-decoration:none;color:inherit;cursor:pointer;transition:transform 0.2s;">
             <div class="stat-icon purple"><?= icon('file-text') ?></div>
-            <div class="stat-info"><h4>Quizzes Taken</h4><div class="stat-value"><?= $quizCount ?></div></div>
+            <div class="stat-info">
+                <h4>Quizzes Taken</h4>
+                <div class="stat-value"><?= $quizCount ?></div>
+            </div>
         </a>
-        <a href="#quizHistory" class="stat-card" style="text-decoration:none;color:inherit;cursor:pointer;transition:transform 0.2s;">
+        <a href="#quizHistory" class="stat-card"
+            style="text-decoration:none;color:inherit;cursor:pointer;transition:transform 0.2s;">
             <div class="stat-icon green"><?= icon('check-circle') ?></div>
-            <div class="stat-info"><h4>Correct Answers</h4><div class="stat-value"><?= $totalCorrect ?>/<?= $totalQuestions ?></div></div>
+            <div class="stat-info">
+                <h4>Correct Answers</h4>
+                <div class="stat-value"><?= $totalCorrect ?>/<?= $totalQuestions ?></div>
+            </div>
         </a>
-        <a href="/student/performance.php" class="stat-card" style="text-decoration:none;color:inherit;cursor:pointer;transition:transform 0.2s;">
+        <a href="/student/performance.php" class="stat-card"
+            style="text-decoration:none;color:inherit;cursor:pointer;transition:transform 0.2s;">
             <div class="stat-icon blue"><?= icon('target') ?></div>
-            <div class="stat-info"><h4>Accuracy</h4><div class="stat-value"><?= percentage($totalCorrect, $totalQuestions) ?>%</div></div>
+            <div class="stat-info">
+                <h4>Accuracy</h4>
+                <div class="stat-value"><?= percentage($totalCorrect, $totalQuestions) ?>%</div>
+            </div>
         </a>
-        <a href="#topicPerf" class="stat-card" style="text-decoration:none;color:inherit;cursor:pointer;transition:transform 0.2s;">
+        <a href="#topicPerf" class="stat-card"
+            style="text-decoration:none;color:inherit;cursor:pointer;transition:transform 0.2s;">
             <div class="stat-icon orange"><?= icon('tag') ?></div>
-            <div class="stat-info"><h4>Topics Covered</h4><div class="stat-value"><?= count($topics) ?></div></div>
+            <div class="stat-info">
+                <h4>Topics Covered</h4>
+                <div class="stat-value"><?= count($topics) ?></div>
+            </div>
         </a>
     </div>
 
@@ -99,23 +118,30 @@ require_once __DIR__ . '/../includes/header.php';
 
         <!-- Topic Performance Chart -->
         <div class="card">
-            <div class="card-header"><h3 id="topicPerf">Topic Performance</h3></div>
+            <div class="card-header">
+                <h3 id="topicPerf">Topic Performance</h3>
+            </div>
             <?php if (empty($topics)): ?>
-                <div class="empty-state" style="padding:30px;"><p>No quiz data yet for this class.</p></div>
+                <div class="empty-state" style="padding:30px;">
+                    <p>No quiz data yet for this class.</p>
+                </div>
             <?php else: ?>
-                <div style="position:relative;height:260px;margin-bottom:16px;">
+                <div style="position:relative;height:<?= max(200, count($topics) * 45) ?>px;margin-bottom:16px;">
                     <canvas id="topicPolarChart"></canvas>
                 </div>
                 <div style="display:flex;flex-wrap:wrap;gap:8px;">
                     <?php foreach ($topics as $ti => $t):
                         $pct = percentage($t['correct'], $t['total']);
-                    ?>
-                    <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(255,255,255,0.04);border-radius:6px;font-size:0.8rem;">
-                        <span style="width:10px;height:10px;border-radius:3px;background:<?= ['#4F8EF7','#10B981','#8B5CF6','#F59E0B','#EF4444','#EC4899','#06B6D4','#84CC16'][$ti % 8] ?>;display:inline-block;"></span>
-                        <span><?= sanitize($t['topic_name']) ?></span>
-                        <span style="font-weight:700;color:<?= $pct >= 70 ? 'var(--accent-green)' : ($pct >= 40 ? '#ffc107' : '#ff3860') ?>;"><?= $pct ?>%</span>
-                        <span style="color:var(--text-muted);">(<?= $t['correct'] ?>/<?= $t['total'] ?>)</span>
-                    </div>
+                        ?>
+                        <div
+                            style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(255,255,255,0.04);border-radius:6px;font-size:0.8rem;">
+                            <span
+                                style="width:10px;height:10px;border-radius:3px;background:<?= ['#4F8EF7', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444', '#EC4899', '#06B6D4', '#84CC16'][$ti % 8] ?>;display:inline-block;"></span>
+                            <span><?= sanitize($t['topic_name']) ?></span>
+                            <span
+                                style="font-weight:700;color:<?= $pct >= 70 ? 'var(--accent-green)' : ($pct >= 40 ? '#ffc107' : '#ff3860') ?>;"><?= $pct ?>%</span>
+                            <span style="color:var(--text-muted);">(<?= $t['correct'] ?>/<?= $t['total'] ?>)</span>
+                        </div>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -123,19 +149,24 @@ require_once __DIR__ . '/../includes/header.php';
 
         <!-- Score Trend Chart -->
         <div class="card">
-            <div class="card-header"><h3 id="quizHistory">Score Trend</h3></div>
+            <div class="card-header">
+                <h3 id="quizHistory">Score Trend</h3>
+            </div>
             <?php
             $attemptedQuizzes = array_filter($quizzes, fn($q) => $q['total_questions'] > 0);
             ?>
             <?php if (empty($attemptedQuizzes)): ?>
-                <div class="empty-state" style="padding:30px;"><p>No quizzes attempted yet.</p></div>
+                <div class="empty-state" style="padding:30px;">
+                    <p>No quizzes attempted yet.</p>
+                </div>
             <?php else: ?>
                 <div style="position:relative;height:260px;margin-bottom:16px;">
                     <canvas id="scoreTrendLine"></canvas>
                 </div>
                 <div style="display:flex;justify-content:center;gap:20px;font-size:0.8rem;color:var(--text-muted);">
                     <span>● Avg: <?= $totalQuestions > 0 ? round($totalCorrect / $totalQuestions * 100) : 0 ?>%</span>
-                    <span>Best: <?= $totalQuestions > 0 ? max(array_map(fn($q) => $q['total_questions'] > 0 ? round($q['total_correct'] / $q['total_questions'] * 100) : 0, $attemptedQuizzes)) : 0 ?>%</span>
+                    <span>Best:
+                        <?= $totalQuestions > 0 ? max(array_map(fn($q) => $q['total_questions'] > 0 ? round($q['total_correct'] / $q['total_questions'] * 100) : 0, $attemptedQuizzes)) : 0 ?>%</span>
                     <span><?= count($attemptedQuizzes) ?> quizzes</span>
                 </div>
             <?php endif; ?>
@@ -144,38 +175,44 @@ require_once __DIR__ . '/../includes/header.php';
 
     <!-- Quiz History List -->
     <div class="card">
-        <div class="card-header"><h3>Quiz History</h3></div>
+        <div class="card-header">
+            <h3>Quiz History</h3>
+        </div>
         <?php if (empty($quizzes)): ?>
-            <div class="empty-state" style="padding:30px;"><p>No quizzes completed in this class yet.</p></div>
+            <div class="empty-state" style="padding:30px;">
+                <p>No quizzes completed in this class yet.</p>
+            </div>
         <?php else: ?>
             <?php foreach ($quizzes as $q): ?>
-            <a href="<?= $q['total_questions'] > 0 ? '/student/quiz_review.php?id=' . $q['id'] : '#' ?>" style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border-glass);color:var(--text-primary);text-decoration:none;transition:background 0.2s;border-radius:6px;padding-left:8px;padding-right:8px;<?= $q['total_questions'] > 0 ? '' : 'pointer-events:none;opacity:0.6;' ?>">
-                <div>
-                    <strong style="font-size:0.9rem;"><?= sanitize($q['title']) ?></strong>
-                    <div style="font-size:0.8rem;color:var(--text-muted);">
-                        Code: <?= sanitize($q['quiz_code']) ?>
-                        <?php if ($q['attempt_date']): ?>
-                            • <?= formatDate($q['attempt_date']) ?>
-                        <?php endif; ?>
+                <a href="<?= $q['total_questions'] > 0 ? '/student/quiz_review.php?id=' . $q['id'] : '#' ?>"
+                    style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);color:var(--text-primary);text-decoration:none;transition:background 0.2s;border-radius:6px;padding-left:8px;padding-right:8px;<?= $q['total_questions'] > 0 ? '' : 'pointer-events:none;opacity:0.6;' ?>">
+                    <div>
+                        <strong style="font-size:0.9rem;"><?= sanitize($q['title']) ?></strong>
+                        <div style="font-size:0.8rem;color:var(--text-muted);">
+                            Code: <?= sanitize($q['quiz_code']) ?>
+                            <?php if ($q['attempt_date']): ?>
+                                • <?= formatDate($q['attempt_date']) ?>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px;">
-                    <div style="text-align:right;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="text-align:right;">
+                            <?php if ($q['total_questions'] > 0): ?>
+                                <?php $pct = percentage($q['total_correct'], $q['total_questions']); ?>
+                                <div
+                                    style="font-weight:700;font-size:1.1rem;color:<?= $pct >= 70 ? 'var(--accent-green)' : ($pct >= 40 ? 'var(--accent-yellow, #ffc107)' : 'var(--accent-red, #ff3860)') ?>;">
+                                    <?= $q['total_correct'] ?>/<?= $q['total_questions'] ?>
+                                </div>
+                                <div style="font-size:0.75rem;color:var(--text-muted);"><?= $pct ?>%</div>
+                            <?php else: ?>
+                                <span class="badge" style="background:rgba(255,255,255,0.1);color:var(--text-muted);">Missed</span>
+                            <?php endif; ?>
+                        </div>
                         <?php if ($q['total_questions'] > 0): ?>
-                            <?php $pct = percentage($q['total_correct'], $q['total_questions']); ?>
-                            <div style="font-weight:700;font-size:1.1rem;color:<?= $pct >= 70 ? 'var(--accent-green)' : ($pct >= 40 ? 'var(--accent-yellow, #ffc107)' : 'var(--accent-red, #ff3860)') ?>;">
-                                <?= $q['total_correct'] ?>/<?= $q['total_questions'] ?>
-                            </div>
-                            <div style="font-size:0.75rem;color:var(--text-muted);"><?= $pct ?>%</div>
-                        <?php else: ?>
-                            <span class="badge" style="background:rgba(255,255,255,0.1);color:var(--text-muted);">Missed</span>
+                            <span style="color:var(--text-muted);font-size:0.8rem;">→</span>
                         <?php endif; ?>
                     </div>
-                    <?php if ($q['total_questions'] > 0): ?>
-                        <span style="color:var(--text-muted);font-size:0.8rem;">→</span>
-                    <?php endif; ?>
-                </div>
-            </a>
+                </a>
             <?php endforeach; ?>
         <?php endif; ?>
     </div>
@@ -185,104 +222,133 @@ require_once __DIR__ . '/../includes/header.php';
 
 <script src="/assets/js/chart.min.js"></script>
 <script>
-const chartColors = ['#4F8EF7','#10B981','#8B5CF6','#F59E0B','#EF4444','#EC4899','#06B6D4','#84CC16'];
+    const chartColors = ['#4F8EF7', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444', '#EC4899', '#06B6D4', '#84CC16'];
 
-// Topic Polar Area Chart
-const polarCtx = document.getElementById('topicPolarChart');
-if (polarCtx) {
-    const topics = <?= json_encode(array_map(fn($t) => [
-        'name' => $t['topic_name'],
-        'pct' => (int)$t['total'] > 0 ? round((int)$t['correct'] / (int)$t['total'] * 100) : 0,
-        'correct' => (int)$t['correct'],
-        'total' => (int)$t['total']
-    ], $topics)) ?>;
-    new Chart(polarCtx, {
-        type: 'polarArea',
-        data: {
-            labels: topics.map(t => t.name),
-            datasets: [{
-                data: topics.map(t => t.pct),
-                backgroundColor: chartColors.slice(0, topics.length).map(c => c + '55'),
-                borderColor: chartColors.slice(0, topics.length),
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: '#1a1d27', titleColor: '#e8eaed', bodyColor: '#9aa0a8',
-                    borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
-                    callbacks: { label: ctx => ctx.parsed.r + '% (' + topics[ctx.dataIndex].correct + '/' + topics[ctx.dataIndex].total + ')' }
-                }
+    // Topic Performance — Horizontal Bar Chart
+    const topicCtx = document.getElementById('topicPolarChart');
+    if (topicCtx) {
+        const topics = <?= json_encode(array_map(fn($t) => [
+            'name' => $t['topic_name'],
+            'pct' => (int) $t['total'] > 0 ? round((int) $t['correct'] / (int) $t['total'] * 100) : 0,
+            'correct' => (int) $t['correct'],
+            'total' => (int) $t['total']
+        ], $topics)) ?>;
+
+        Chart.defaults.font.family = "'Montserrat', sans-serif";
+
+        new Chart(topicCtx, {
+            type: 'bar',
+            data: {
+                labels: topics.map(t => t.name),
+                datasets: [{
+                    label: 'Score',
+                    data: topics.map(t => t.pct),
+                    backgroundColor: topics.map(t =>
+                        t.pct >= 70 ? '#10B981' :
+                            t.pct >= 40 ? '#FBBF24' : '#EF4444'
+                    ),
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    barPercentage: 0.55,
+                    categoryPercentage: 0.8
+                }]
             },
-            scales: {
-                r: {
-                    min: 0, max: 100,
-                    ticks: { color: '#5f6572', backdropColor: 'transparent', stepSize: 25, font: { size: 9 } },
-                    grid: { color: 'rgba(255,255,255,0.06)' }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                layout: { padding: { right: window.innerWidth < 768 ? 10 : 0 } },
+                animation: { duration: 800, easing: 'easeOutQuart' },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#2D2A43',
+                        titleColor: '#fff',
+                        titleFont: { size: 13, weight: 700 },
+                        bodyColor: '#d1d5db',
+                        bodyFont: { size: 12 },
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
+                        callbacks: {
+                            label: function (ctx) {
+                                const t = topics[ctx.dataIndex];
+                                return ' ' + t.pct + '% (' + t.correct + '/' + t.total + ' correct)';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        min: 0, max: 100,
+                        ticks: { color: '#9CA3AF', font: { size: 10 }, callback: v => v + '%', stepSize: 25 },
+                        grid: { color: '#F3F4F6' },
+                        border: { display: false }
+                    },
+                    y: {
+                        ticks: { color: '#4B5563', font: { size: 11, weight: 600 } },
+                        grid: { display: false },
+                        border: { display: false }
+                    }
                 }
             }
-        }
-    });
-}
+        });
+    }
 
-// Score Trend Line Chart
-const trendCtx = document.getElementById('scoreTrendLine');
-if (trendCtx) {
-    const quizData = <?= json_encode(array_values(array_map(fn($q) => [
-        'title' => $q['title'],
-        'pct' => (int)$q['total_questions'] > 0 ? round((int)$q['total_correct'] / (int)$q['total_questions'] * 100) : null,
-        'correct' => (int)$q['total_correct'],
-        'total' => (int)$q['total_questions']
-    ], array_reverse(array_filter($quizzes, fn($q) => $q['total_questions'] > 0))))) ?>;
-    const avg = <?= $totalQuestions > 0 ? round($totalCorrect / $totalQuestions * 100) : 0 ?>;
+    // Score Trend Line Chart
+    const trendCtx = document.getElementById('scoreTrendLine');
+    if (trendCtx) {
+        const quizData = <?= json_encode(array_values(array_map(fn($q) => [
+            'title' => $q['title'],
+            'pct' => (int) $q['total_questions'] > 0 ? round((int) $q['total_correct'] / (int) $q['total_questions'] * 100) : null,
+            'correct' => (int) $q['total_correct'],
+            'total' => (int) $q['total_questions']
+        ], array_reverse(array_filter($quizzes, fn($q) => $q['total_questions'] > 0))))) ?>;
+        const avg = <?= $totalQuestions > 0 ? round($totalCorrect / $totalQuestions * 100) : 0 ?>;
 
-    new Chart(trendCtx, {
-        type: 'line',
-        data: {
-            labels: quizData.map(d => d.title.length > 10 ? d.title.substring(0,10)+'..' : d.title),
-            datasets: [{
-                label: 'Score %',
-                data: quizData.map(d => d.pct),
-                borderColor: '#4F8EF7',
-                backgroundColor: 'rgba(79,142,247,0.08)',
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: quizData.map(d => d.pct >= 70 ? '#10B981' : d.pct >= 40 ? '#F59E0B' : '#EF4444'),
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 6,
-                pointHoverRadius: 8
-            },{
-                label: 'Average',
-                data: quizData.map(() => avg),
-                borderColor: 'rgba(139,92,246,0.4)',
-                borderDash: [6, 4],
-                borderWidth: 1.5,
-                pointRadius: 0,
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { intersect: false, mode: 'index' },
-            plugins: {
-                legend: { labels: { color: '#9aa0a8', font: { size: 10 }, usePointStyle: true, pointStyle: 'circle' } },
-                tooltip: {
-                    backgroundColor: '#1a1d27', titleColor: '#e8eaed', bodyColor: '#9aa0a8',
-                    borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
-                    callbacks: { label: ctx => ctx.dataset.label === 'Average' ? 'Avg: '+avg+'%' : ctx.parsed.y+'% ('+quizData[ctx.dataIndex].correct+'/'+quizData[ctx.dataIndex].total+')' }
-                }
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: quizData.map(d => { const max = window.innerWidth < 768 ? 7 : 10; return d.title.length > max ? d.title.substring(0,max)+'…' : d.title; }),
+                datasets: [{
+                    label: 'Score %',
+                    data: quizData.map(d => d.pct),
+                    borderColor: '#4F8EF7',
+                    backgroundColor: 'rgba(79,142,247,0.08)',
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: quizData.map(d => d.pct >= 70 ? '#10B981' : d.pct >= 40 ? '#F59E0B' : '#EF4444'),
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }, {
+                    label: 'Average',
+                    data: quizData.map(() => avg),
+                    borderColor: 'rgba(139,92,246,0.4)',
+                    borderDash: [6, 4],
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                    fill: false
+                }]
             },
-            scales: {
-                x: { ticks: { color: '#5f6572', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
-                y: { min: 0, max: 100, ticks: { color: '#5f6572', callback: v => v+'%' }, grid: { color: 'rgba(255,255,255,0.04)' } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: { padding: { right: window.innerWidth < 768 ? 8 : 0 } },
+                interaction: { intersect: false, mode: 'index' },
+                plugins: {
+                    legend: { labels: { color: '#6B7280', font: { size: 10 }, usePointStyle: true, pointStyle: 'circle' } },
+                    tooltip: {
+                        backgroundColor: '#2D2A43', titleColor: '#fff', bodyColor: '#d1d5db',
+                        borderColor: '#E5E7EB', borderWidth: 1,
+                        callbacks: { label: ctx => ctx.dataset.label === 'Average' ? 'Avg: ' + avg + '%' : ctx.parsed.y + '% (' + quizData[ctx.dataIndex].correct + '/' + quizData[ctx.dataIndex].total + ')' }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: '#9CA3AF', font: { size: 10 } }, grid: { color: '#F3F4F6' } },
+                    y: { min: 0, max: 100, ticks: { color: '#9CA3AF', callback: v => v + '%' }, grid: { color: '#F3F4F6' } }
+                }
             }
-        }
-    });
-}
+        });
+    }
 </script>

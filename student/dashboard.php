@@ -50,7 +50,7 @@ $topicData = $topicChart->fetchAll();
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container page-wrapper animate-fade">
+<div class="page-wrapper animate-fade">
     <div class="page-header">
         <h1>Welcome, <?= sanitize(getCurrentUserName()) ?> </h1>
         <a href="/student/join_quiz.php" class="btn btn-primary btn-lg"><?= icon('zap', 16) ?> Join Quiz</a>
@@ -97,7 +97,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="empty-state" style="padding:30px;"><p>Not enrolled in any class yet.</p></div>
             <?php else: ?>
                 <?php foreach ($classes as $c): ?>
-                <a href="/student/class_view.php?id=<?= $c['id'] ?>" style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border-glass);color:var(--text-primary);">
+                <a href="/student/class_view.php?id=<?= $c['id'] ?>" style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);color:var(--text-primary);">
                     <div>
                         <strong><?= sanitize($c['class_name']) ?></strong>
                         <div style="font-size:0.8rem;color:var(--text-muted);"><?= sanitize($c['subject']) ?> • <?= sanitize($c['teacher_name']) ?></div>
@@ -115,7 +115,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="empty-state" style="padding:30px;"><p>No quizzes taken yet. Join a quiz to get started!</p></div>
             <?php else: ?>
                 <?php foreach ($recent as $r): ?>
-                <a href="/student/quiz_review.php?id=<?= $r['quiz_id'] ?>" style="display:flex;justify-content:space-between;align-items:center;padding:12px 8px;border-bottom:1px solid var(--border-glass);color:var(--text-primary);text-decoration:none;border-radius:6px;transition:background 0.2s;">
+                <a href="/student/quiz_review.php?id=<?= $r['quiz_id'] ?>" style="display:flex;justify-content:space-between;align-items:center;padding:12px 8px;border-bottom:1px solid var(--border);color:var(--text-primary);text-decoration:none;border-radius:6px;transition:background 0.2s;">
                     <div>
                         <strong style="font-size:0.9rem;"><?= sanitize($r['title']) ?></strong>
                         <div style="font-size:0.8rem;color:var(--text-muted);"><?= sanitize($r['class_name']) ?> • <?= formatDate($r['joined_at']) ?></div>
@@ -147,7 +147,7 @@ if (scoreCtx) {
     new Chart(scoreCtx, {
         type: 'bar',
         data: {
-            labels: data.map(d => d.title.length > 12 ? d.title.substring(0,12)+'...' : d.title),
+            labels: data.map(d => { const max = window.innerWidth < 768 ? 8 : 12; return d.title.length > max ? d.title.substring(0,max)+'…' : d.title; }),
             datasets: [{
                 label: 'Score %',
                 data: data.map(d => d.pct),
@@ -161,17 +161,18 @@ if (scoreCtx) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { right: window.innerWidth < 768 ? 8 : 0 } },
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: '#1a1d27', titleColor: '#e8eaed', bodyColor: '#9aa0a8',
-                    borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+                    backgroundColor: '#2D2A43', titleColor: '#fff', bodyColor: '#d1d5db',
+                    borderColor: '#E5E7EB', borderWidth: 1,
                     callbacks: { label: ctx => ctx.parsed.y + '% (' + data[ctx.dataIndex].total_correct + '/' + data[ctx.dataIndex].total_questions + ')' }
                 }
             },
             scales: {
-                x: { ticks: { color: '#5f6572', font: { size: 10 } }, grid: { display: false } },
-                y: { min: 0, max: 100, ticks: { color: '#5f6572', callback: v => v+'%' }, grid: { color: 'rgba(255,255,255,0.04)' } }
+                x: { ticks: { color: '#9CA3AF', font: { size: 10 } }, grid: { display: false } },
+                y: { min: 0, max: 100, ticks: { color: '#9CA3AF', callback: v => v+'%' }, grid: { color: '#F3F4F6' } }
             }
         }
     });
@@ -181,11 +182,12 @@ if (scoreCtx) {
 const topicCtx = document.getElementById('topicChart');
 if (topicCtx) {
     const topics = <?= json_encode($topicData) ?>;
-    if (topics.length >= 3) {
+    const isMobile = window.innerWidth < 768;
+    if (topics.length >= 3 && !isMobile) {
         new Chart(topicCtx, {
             type: 'radar',
             data: {
-                labels: topics.map(t => t.topic_name),
+                labels: topics.map(t => t.topic_name.length > 15 ? t.topic_name.substring(0,15)+'…' : t.topic_name),
                 datasets: [{
                     label: 'Accuracy %',
                     data: topics.map(t => t.total > 0 ? Math.round(t.correct / t.total * 100) : 0),
@@ -203,15 +205,15 @@ if (topicCtx) {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
-                    tooltip: { backgroundColor: '#1a1d27', titleColor: '#e8eaed', bodyColor: '#9aa0a8' }
+                    tooltip: { backgroundColor: '#2D2A43', titleColor: '#fff', bodyColor: '#d1d5db' }
                 },
                 scales: {
                     r: {
                         min: 0, max: 100,
-                        ticks: { color: '#5f6572', backdropColor: 'transparent', stepSize: 25 },
-                        grid: { color: 'rgba(255,255,255,0.06)' },
-                        pointLabels: { color: '#9aa0a8', font: { size: 11 } },
-                        angleLines: { color: 'rgba(255,255,255,0.06)' }
+                        ticks: { color: '#9CA3AF', backdropColor: 'transparent', stepSize: 25 },
+                        grid: { color: '#F3F4F6' },
+                        pointLabels: { color: '#6B7280', font: { size: 10 } },
+                        angleLines: { color: '#F3F4F6' }
                     }
                 }
             }
@@ -236,8 +238,8 @@ if (topicCtx) {
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { min: 0, max: 100, ticks: { color: '#5f6572', callback: v => v+'%' }, grid: { color: 'rgba(255,255,255,0.04)' } },
-                    y: { ticks: { color: '#9aa0a8' }, grid: { display: false } }
+                    x: { min: 0, max: 100, ticks: { color: '#9CA3AF', callback: v => v+'%' }, grid: { color: '#F3F4F6' } },
+                    y: { ticks: { color: '#6B7280' }, grid: { display: false } }
                 }
             }
         });

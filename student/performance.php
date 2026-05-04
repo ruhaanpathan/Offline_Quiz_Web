@@ -82,10 +82,10 @@ if ($totalQuizzes >= 4) {
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container page-wrapper animate-fade">
+<div class="page-wrapper animate-fade">
     <div class="page-header">
         <div>
-            <a href="/student/dashboard.php" style="color:var(--text-muted);font-size:0.85rem;">← Back to Dashboard</a>
+            <a href="/student/dashboard.php" style="color:var(--text-secondary);font-size:0.85rem;">← Back to Dashboard</a>
             <h1>My Performance</h1>
         </div>
         <a href="/student/ajax/export_csv.php" class="btn btn-outline"><?= icon('download', 16) ?> Download CSV</a>
@@ -97,7 +97,7 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="stat-card"><div class="stat-icon green"><?= icon('check-circle') ?></div><div class="stat-info"><h4>Accuracy</h4><div class="stat-value"><?= $overallAccuracy ?>%</div></div></div>
         <div class="stat-card"><div class="stat-icon blue"><?= icon('target') ?></div><div class="stat-info"><h4>Correct</h4><div class="stat-value"><?= $totalCorrect ?>/<?= $totalQuestions ?></div></div></div>
         <div class="stat-card"><div class="stat-icon orange"><?= icon('trophy') ?></div><div class="stat-info"><h4>Best Score</h4><div class="stat-value"><?= $bestScore ?>%</div></div></div>
-        <div class="stat-card" style="border-color:<?= $trend === 'improving' ? 'rgba(16,185,129,0.4)' : ($trend === 'declining' ? 'rgba(239,68,68,0.3)' : 'var(--border-glass)') ?>;">
+        <div class="stat-card" style="border-color:<?= $trend === 'improving' ? 'rgba(16,185,129,0.4)' : ($trend === 'declining' ? 'rgba(239,68,68,0.3)' : 'var(--border)') ?>;">
             <div class="stat-icon" style="background:<?= $trend === 'improving' ? 'rgba(16,185,129,0.15)' : ($trend === 'declining' ? 'rgba(239,68,68,0.15)' : 'rgba(139,92,246,0.15)') ?>;color:<?= $trend === 'improving' ? 'var(--accent-green)' : ($trend === 'declining' ? 'var(--accent-red)' : 'var(--accent-purple)') ?>;">
                 <?= icon($trend === 'improving' ? 'trending-up' : ($trend === 'declining' ? 'trending-down' : 'minus')) ?>
             </div>
@@ -108,7 +108,7 @@ require_once __DIR__ . '/../includes/header.php';
     <!-- Row 1: Score Trend (bar+line combo) + Score Distribution -->
     <div style="display:grid;grid-template-columns:5fr 2fr;gap:24px;margin-bottom:24px;">
         <div class="card">
-            <div class="card-header"><h3>Score Trend</h3><span style="font-size:0.75rem;color:var(--text-muted);">Bar = Score per quiz · Line = Running average</span></div>
+            <div class="card-header" style="flex-wrap:wrap;"><h3>Score Trend</h3><span class="breadcrumb" style="font-size:0.72rem;color:var(--text-muted);">Bar = Score · Line = Average</span></div>
             <?php if ($totalQuizzes > 0): ?>
             <div style="position:relative;height:280px;"><canvas id="comboChart"></canvas></div>
             <?php else: ?>
@@ -143,7 +143,7 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="card">
             <div class="card-header"><h3>Topic Accuracy</h3></div>
             <?php if (!empty($topicData)): ?>
-            <div style="position:relative;height:280px;"><canvas id="topicBarChart"></canvas></div>
+            <div style="position:relative;height:<?= max(280, count($topicData) * 40) ?>px;"><canvas id="topicBarChart"></canvas></div>
             <?php else: ?>
             <div class="empty-state" style="padding:30px;"><p>No data yet.</p></div>
             <?php endif; ?>
@@ -225,7 +225,9 @@ require_once __DIR__ . '/../includes/header.php';
 <script src="/assets/js/chart.min.js"></script>
 <script>
 const CC = ['#4F8EF7','#10B981','#8B5CF6','#F59E0B','#EF4444','#EC4899','#06B6D4','#84CC16'];
-const TS = { backgroundColor:'#1a1d27', titleColor:'#e8eaed', bodyColor:'#9aa0a8', borderColor:'rgba(255,255,255,0.1)', borderWidth:1 };
+Chart.defaults.font.family = "'Montserrat', sans-serif";
+Chart.defaults.font.weight = 500;
+const TS = { backgroundColor:'#2D2A43', titleColor:'#fff', bodyColor:'#d1d5db', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, padding:12, cornerRadius:10, boxPadding:6 };
 
 // ===== COMBO: Bar (individual) + Line (running avg) =====
 const comboCtx = document.getElementById('comboChart');
@@ -235,7 +237,6 @@ if (comboCtx) {
         'c' => (int)$a['total_correct'], 't' => (int)$a['total_questions'],
         'date' => date('M d', strtotime($a['joined_at']))
     ], $attempts)) ?>;
-    // Running average
     let sum = 0;
     const runAvg = raw.map((d,i) => { sum += d.pct; return Math.round(sum / (i+1)); });
 
@@ -248,30 +249,32 @@ if (comboCtx) {
                 data: raw.map(d => d.pct),
                 backgroundColor: raw.map(d => d.pct >= 70 ? 'rgba(16,185,129,0.6)' : d.pct >= 40 ? 'rgba(245,158,11,0.6)' : 'rgba(239,68,68,0.6)'),
                 borderColor: raw.map(d => d.pct >= 70 ? '#10B981' : d.pct >= 40 ? '#F59E0B' : '#EF4444'),
-                borderWidth: 1.5, borderRadius: 4, borderSkipped: false,
+                borderWidth: 1.5, borderRadius: 6, borderSkipped: false,
                 order: 2
             },{
                 type: 'line',
                 label: 'Running Avg',
                 data: runAvg,
                 borderColor: '#8B5CF6',
-                backgroundColor: 'rgba(139,92,246,0.05)',
-                borderWidth: 2.5, tension: 0.3, fill: false,
-                pointBackgroundColor: '#8B5CF6', pointBorderColor: '#1a1d27',
-                pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6,
+                backgroundColor: 'transparent',
+                borderWidth: 2.5, tension: 0.35, fill: false,
+                pointBackgroundColor: '#fff', pointBorderColor: '#8B5CF6',
+                pointBorderWidth: 2.5, pointRadius: 4, pointHoverRadius: 7,
                 order: 1
             }]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
+            layout: { padding: { right: window.innerWidth < 768 ? 8 : 0, left: window.innerWidth < 768 ? 2 : 0 } },
             interaction: { intersect: false, mode: 'index' },
+            animation: { duration: 800, easing: 'easeOutQuart' },
             plugins: {
-                legend: { labels: { color:'#9aa0a8', font:{size:10}, usePointStyle:true, pointStyle:'circle' } },
-                tooltip: { ...TS, callbacks: { title: ctx => raw[ctx[0].dataIndex].title, label: ctx => ctx.dataset.type === 'line' ? 'Avg: '+ctx.parsed.y+'%' : ctx.parsed.y+'% ('+raw[ctx.dataIndex].c+'/'+raw[ctx.dataIndex].t+')' } }
+                legend: { position: window.innerWidth < 768 ? 'bottom' : 'top', labels: { color:'#6B7280', font:{size: window.innerWidth < 768 ? 10 : 11, weight:600}, usePointStyle:true, pointStyle:'circle', padding: window.innerWidth < 768 ? 10 : 16 } },
+                tooltip: { ...TS, callbacks: { title: ctx => raw[ctx[0].dataIndex].title, label: ctx => ctx.dataset.type === 'line' ? ' Avg: '+ctx.parsed.y+'%' : ' '+ctx.parsed.y+'% ('+raw[ctx.dataIndex].c+'/'+raw[ctx.dataIndex].t+')' } }
             },
             scales: {
-                x: { ticks:{color:'#5f6572',font:{size:10}}, grid:{color:'rgba(255,255,255,0.03)'} },
-                y: { min:0, max:100, ticks:{color:'#5f6572',callback:v=>v+'%'}, grid:{color:'rgba(255,255,255,0.04)'} }
+                x: { ticks:{color:'#9CA3AF',font:{size:10}}, grid:{display:false}, border:{display:false} },
+                y: { min:0, max:100, ticks:{color:'#9CA3AF',callback:v=>v+'%',stepSize:25}, grid:{color:'#F3F4F6'}, border:{display:false} }
             }
         }
     });
@@ -284,9 +287,9 @@ if (distCtx) {
         type: 'doughnut',
         data: {
             labels: ['70-100%','40-69%','0-39%'],
-            datasets: [{ data: [<?= $dist['high'] ?>,<?= $dist['mid'] ?>,<?= $dist['low'] ?>], backgroundColor: ['rgba(16,185,129,0.7)','rgba(255,193,7,0.7)','rgba(255,56,96,0.7)'], borderColor:'#0f1117', borderWidth:3, hoverOffset:6 }]
+            datasets: [{ data: [<?= $dist['high'] ?>,<?= $dist['mid'] ?>,<?= $dist['low'] ?>], backgroundColor: ['#10B981','#FBBF24','#EF4444'], borderColor:'#fff', borderWidth:3, hoverOffset:8, borderRadius:4, spacing:2 }]
         },
-        options: { responsive:true, maintainAspectRatio:false, cutout:'55%', plugins: { legend:{display:false}, tooltip:TS } }
+        options: { responsive:true, maintainAspectRatio:false, cutout:'60%', animation:{duration:800,easing:'easeOutQuart'}, plugins: { legend:{display:false}, tooltip:TS } }
     });
 }
 
@@ -299,16 +302,18 @@ if (subCtx) {
         data: {
             labels: subs.map(s => s.subject),
             datasets: [
-                { label:'Correct', data:subs.map(s=>s.correct), backgroundColor:'rgba(16,185,129,0.7)', borderColor:'#10B981', borderWidth:1, borderRadius:4 },
-                { label:'Wrong', data:subs.map(s=>s.total - s.correct), backgroundColor:'rgba(239,68,68,0.5)', borderColor:'#EF4444', borderWidth:1, borderRadius:4 }
+                { label:'Correct', data:subs.map(s=>s.correct), backgroundColor:'rgba(16,185,129,0.65)', borderRadius:6, borderSkipped:false },
+                { label:'Wrong', data:subs.map(s=>s.total - s.correct), backgroundColor:'rgba(239,68,68,0.45)', borderRadius:6, borderSkipped:false }
             ]
         },
         options: {
             responsive:true, maintainAspectRatio:false,
-            plugins: { legend:{ labels:{color:'#9aa0a8',font:{size:10},usePointStyle:true,pointStyle:'rect'} }, tooltip:{ ...TS, callbacks:{ afterLabel: ctx => { const s = subs[ctx.dataIndex]; return 'Accuracy: '+Math.round(s.correct/s.total*100)+'% ('+s.quizzes+' quizzes)'; } } } },
+            layout: { padding: { right: window.innerWidth < 768 ? 8 : 0 } },
+            animation: { duration: 800, easing: 'easeOutQuart' },
+            plugins: { legend:{ position: window.innerWidth < 768 ? 'bottom' : 'top', labels:{color:'#6B7280',font:{size: window.innerWidth < 768 ? 10 : 11,weight:600},usePointStyle:true,pointStyle:'rect',padding: window.innerWidth < 768 ? 10 : 16} }, tooltip:{ ...TS, callbacks:{ afterLabel: ctx => { const s = subs[ctx.dataIndex]; return 'Accuracy: '+Math.round(s.correct/s.total*100)+'% ('+s.quizzes+' quizzes)'; } } } },
             scales: {
-                x: { stacked:true, ticks:{color:'#9aa0a8'}, grid:{display:false} },
-                y: { stacked:true, ticks:{color:'#5f6572'}, grid:{color:'rgba(255,255,255,0.04)'} }
+                x: { stacked:true, ticks:{color:'#9CA3AF',font:{size:11}}, grid:{display:false}, border:{display:false} },
+                y: { stacked:true, ticks:{color:'#9CA3AF'}, grid:{color:'#F3F4F6'}, border:{display:false} }
             }
         }
     });
@@ -318,29 +323,26 @@ if (subCtx) {
 const topicCtx = document.getElementById('topicBarChart');
 if (topicCtx) {
     const topics = <?= json_encode(array_map(fn($t) => ['name'=>$t['topic_name'].' ('.$t['subject'].')','pct'=>(float)$t['accuracy'],'c'=>(int)$t['correct'],'t'=>(int)$t['total']], $topicData)) ?>;
-    // Sort by accuracy descending for display
     topics.sort((a,b) => a.pct - b.pct);
     new Chart(topicCtx, {
         type: 'bar',
         data: {
-            labels: topics.map(t => t.name.length > 25 ? t.name.substring(0,25)+'..' : t.name),
+            labels: topics.map(t => { const max = window.innerWidth < 768 ? 16 : 25; return t.name.length > max ? t.name.substring(0,max)+'…' : t.name; }),
             datasets: [{
                 label: 'Accuracy %',
                 data: topics.map(t => t.pct),
-                backgroundColor: topics.map((t,i) => {
-                    const c = t.pct >= 70 ? [16,185,129] : t.pct >= 40 ? [245,158,11] : [239,68,68];
-                    return `rgba(${c[0]},${c[1]},${c[2]},0.65)`;
-                }),
-                borderColor: topics.map(t => t.pct >= 70 ? '#10B981' : t.pct >= 40 ? '#F59E0B' : '#EF4444'),
-                borderWidth: 1.5, borderRadius: 5, borderSkipped: false
+                backgroundColor: topics.map(t => t.pct >= 70 ? '#10B981' : t.pct >= 40 ? '#FBBF24' : '#EF4444'),
+                borderRadius: 6, borderSkipped: false, barPercentage: 0.55, categoryPercentage: 0.8
             }]
         },
         options: {
             indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-            plugins: { legend:{display:false}, tooltip:{ ...TS, callbacks:{ label: ctx => ctx.parsed.x+'% ('+topics[ctx.dataIndex].c+'/'+topics[ctx.dataIndex].t+')' } } },
+            layout: { padding: { right: window.innerWidth < 768 ? 10 : 0 } },
+            animation: { duration: 800, easing: 'easeOutQuart' },
+            plugins: { legend:{display:false}, tooltip:{ ...TS, callbacks:{ label: ctx => ' '+ctx.parsed.x+'% ('+topics[ctx.dataIndex].c+'/'+topics[ctx.dataIndex].t+' correct)' } } },
             scales: {
-                x: { min:0, max:100, ticks:{color:'#5f6572',callback:v=>v+'%'}, grid:{color:'rgba(255,255,255,0.04)'} },
-                y: { ticks:{color:'#9aa0a8',font:{size:10}}, grid:{display:false} }
+                x: { min:0, max:100, ticks:{color:'#9CA3AF',font:{size:10},callback:v=>v+'%',stepSize:25}, grid:{color:'#F3F4F6'}, border:{display:false} },
+                y: { ticks:{color:'#4B5563',font:{size:11,weight:600}}, grid:{display:false}, border:{display:false} }
             }
         }
     });

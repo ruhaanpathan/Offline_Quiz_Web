@@ -43,10 +43,10 @@ $accuracy = percentage($quiz['total_correct'], $quiz['total_questions']);
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container page-wrapper animate-fade">
+<div class="page-wrapper animate-fade">
     <div class="page-header">
         <div>
-            <a href="/student/dashboard.php" style="color:var(--text-muted);font-size:0.85rem;">← Back to Dashboard</a>
+            <a href="/student/dashboard.php" style="color:var(--text-secondary);font-size:0.85rem;">← Back to Dashboard</a>
             <h1><?= sanitize($quiz['title']) ?></h1>
             <p style="color:var(--text-muted);"><?= sanitize($quiz['class_name']) ?> • <?= sanitize($quiz['subject']) ?> • Code: <?= sanitize($quiz['quiz_code']) ?></p>
         </div>
@@ -80,7 +80,7 @@ require_once __DIR__ . '/../includes/header.php';
                 $isCorrect = $q['is_correct'];
                 $unanswered = ($selected === null || $selected === '');
             ?>
-            <div style="padding:20px 0;border-bottom:1px solid var(--border-glass);<?= $i === count($questions)-1 ? 'border:none;' : '' ?>">
+            <div style="padding:20px 0;border-bottom:1px solid var(--border);<?= $i === count($questions)-1 ? 'border:none;' : '' ?>">
                 <!-- Question Header -->
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
                     <div style="display:flex;gap:12px;align-items:flex-start;flex:1;">
@@ -124,8 +124,8 @@ require_once __DIR__ . '/../includes/header.php';
                             $color = 'var(--accent-red, #ff3860)';
                             $icon = icon('x', 14);
                         } else {
-                            $bg = 'rgba(255,255,255,0.03)';
-                            $border = 'rgba(255,255,255,0.08)';
+                            $bg = 'var(--bg-primary)';
+                            $border = 'var(--border)';
                             $color = 'var(--text-secondary)';
                             $icon = '';
                         }

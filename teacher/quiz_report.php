@@ -49,7 +49,7 @@ $totalQuestions = $quiz ? ($students[0]['total_questions'] ?? 0) : 0;
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container page-wrapper animate-fade">
+<div class="page-wrapper animate-fade">
     <div class="page-header">
         <div>
             <h1><?= sanitize($quiz['title']) ?></h1>
@@ -73,7 +73,7 @@ require_once __DIR__ . '/../includes/header.php';
             <canvas id="topicChart" height="250"></canvas>
             <div style="margin-top:16px;">
                 <?php foreach ($topics as $t): ?>
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-glass);">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
                     <span><?= sanitize($t['topic_name']) ?></span>
                     <div style="display:flex;align-items:center;gap:8px;">
                         <div style="width:100px;background:var(--bg-secondary);border-radius:4px;height:6px;overflow:hidden;">
@@ -95,7 +95,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <p style="color:var(--accent-green);">No weak topics! All above 50%.</p>
                 <?php else: ?>
                     <?php foreach ($weak as $t): ?>
-                    <div style="padding:8px 0;border-bottom:1px solid var(--border-glass);display:flex;justify-content:space-between;">
+                    <div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;">
                         <span style="color:var(--accent-red);"><?= sanitize($t['topic_name']) ?></span>
                         <span class="badge badge-red"><?= $t['accuracy'] ?>%</span>
                     </div>
@@ -109,7 +109,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <p style="color:var(--text-muted);">No topics above 80% yet.</p>
                 <?php else: ?>
                     <?php foreach ($strong as $t): ?>
-                    <div style="padding:8px 0;border-bottom:1px solid var(--border-glass);display:flex;justify-content:space-between;">
+                    <div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;">
                         <span style="color:var(--accent-green);"><?= sanitize($t['topic_name']) ?></span>
                         <span class="badge badge-green"><?= $t['accuracy'] ?>%</span>
                     </div>
@@ -146,23 +146,46 @@ require_once __DIR__ . '/../includes/header.php';
 
 <script src="/assets/js/chart.min.js"></script>
 <script>
+Chart.defaults.font.family = "'Montserrat', sans-serif";
+Chart.defaults.font.weight = 500;
 const topicData = <?= json_encode($topics) ?>;
 if (topicData.length > 0 && typeof Chart !== 'undefined') {
     new Chart(document.getElementById('topicChart'), {
         type: 'bar',
         data: {
-            labels: topicData.map(t => t.topic_name),
+            labels: topicData.map(t => { const max = window.innerWidth < 768 ? 10 : 30; return t.topic_name.length > max ? t.topic_name.substring(0,max)+'…' : t.topic_name; }),
             datasets: [{
                 label: 'Accuracy %',
                 data: topicData.map(t => t.accuracy),
-                backgroundColor: topicData.map(t => t.accuracy >= 80 ? 'rgba(16,185,129,0.6)' : t.accuracy >= 50 ? 'rgba(245,158,11,0.6)' : 'rgba(239,68,68,0.6)'),
-                borderRadius: 6
+                backgroundColor: topicData.map(t => t.accuracy >= 80 ? '#10B981' : t.accuracy >= 50 ? '#FBBF24' : '#EF4444'),
+                borderRadius: 6,
+                borderSkipped: false,
+                barPercentage: 0.6,
+                categoryPercentage: 0.7
             }]
         },
         options: {
             responsive: true,
-            scales: { y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9aa0a8' } }, x: { grid: { display: false }, ticks: { color: '#9aa0a8' } } },
-            plugins: { legend: { display: false } }
+            layout: { padding: { right: window.innerWidth < 768 ? 8 : 0 } },
+            animation: { duration: 800, easing: 'easeOutQuart' },
+            scales: {
+                y: { beginAtZero: true, max: 100, grid: { color: '#F3F4F6' }, border: { display: false }, ticks: { color: '#9CA3AF', font: { size: 10 }, callback: v => v + '%', stepSize: 25 } },
+                x: { grid: { display: false }, border: { display: false }, ticks: { color: '#4B5563', font: { size: 11, weight: 600 } } }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#2D2A43', titleColor: '#fff', bodyColor: '#d1d5db',
+                    borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+                    padding: 12, cornerRadius: 10,
+                    callbacks: {
+                        label: function(ctx) {
+                            const t = topicData[ctx.dataIndex];
+                            return ' ' + t.accuracy + '% (' + t.correct_answers + '/' + t.total_answers + ' correct)';
+                        }
+                    }
+                }
+            }
         }
     });
 }

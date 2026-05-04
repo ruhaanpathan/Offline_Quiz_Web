@@ -10,7 +10,7 @@ $preCode = $_GET['code'] ?? '';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container page-wrapper animate-fade">
+<div class="page-wrapper animate-fade">
     <div style="max-width:500px;margin:40px auto;text-align:center;">
         <div style="font-size:3rem;margin-bottom:16px;"></div>
         <h1 style="margin-bottom:8px;">Join a Quiz</h1>
@@ -21,7 +21,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="form-group">
                     <input type="text" id="quizCode" class="form-control" value="<?= sanitize($preCode) ?>"
                            placeholder="Enter quiz code" maxlength="4"
-                           style="text-align:center;font-size:2rem;letter-spacing:12px;font-weight:700;text-transform:uppercase;padding:20px;"
+                           style="text-align:center;font-size:1.8rem;letter-spacing:10px;font-weight:700;text-transform:uppercase;padding:18px;"
                            required autofocus>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block btn-lg" id="joinBtn">Join Quiz</button>

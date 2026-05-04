@@ -94,7 +94,7 @@ $totalRanked = count($ranks);
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container page-wrapper animate-fade">
+<div class="page-wrapper animate-fade">
     <div class="page-header">
         <div>
             <div class="breadcrumb"><a href="/teacher/dashboard.php">Dashboard</a> / <a href="/teacher/class_detail.php?id=<?= $classId ?>"><?= sanitize($class['class_name'] ?? '') ?></a> / <?= sanitize($student['name']) ?></div>
@@ -226,7 +226,9 @@ require_once __DIR__ . '/../includes/header.php';
 
 <script src="/assets/js/chart.min.js"></script>
 <script>
-const TS = { backgroundColor:'#1a1d27', titleColor:'#e8eaed', bodyColor:'#9aa0a8', borderColor:'rgba(255,255,255,0.1)', borderWidth:1 };
+Chart.defaults.font.family = "'Montserrat', sans-serif";
+Chart.defaults.font.weight = 500;
+const TS = { backgroundColor:'#2D2A43', titleColor:'#fff', bodyColor:'#d1d5db', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, padding:12, cornerRadius:10, boxPadding:6 };
 
 // ===== COMBO: Bar + Running Avg Line =====
 const comboCtx = document.getElementById('comboChart');
@@ -246,18 +248,23 @@ if (comboCtx) {
                 type: 'bar', label: 'Score %', data: raw.map(d => d.pct),
                 backgroundColor: raw.map(d => d.pct >= 70 ? 'rgba(16,185,129,0.6)' : d.pct >= 40 ? 'rgba(245,158,11,0.6)' : 'rgba(239,68,68,0.6)'),
                 borderColor: raw.map(d => d.pct >= 70 ? '#10B981' : d.pct >= 40 ? '#F59E0B' : '#EF4444'),
-                borderWidth: 1.5, borderRadius: 4, borderSkipped: false, order: 2
+                borderWidth: 1.5, borderRadius: 6, borderSkipped: false, order: 2
             },{
                 type: 'line', label: 'Running Avg', data: runAvg,
-                borderColor: '#8B5CF6', borderWidth: 2.5, tension: 0.3, fill: false,
-                pointBackgroundColor: '#8B5CF6', pointBorderColor: '#1a1d27', pointBorderWidth: 2, pointRadius: 4, order: 1
+                borderColor: '#8B5CF6', borderWidth: 2.5, tension: 0.35, fill: false,
+                pointBackgroundColor: '#fff', pointBorderColor: '#8B5CF6', pointBorderWidth: 2.5, pointRadius: 4, pointHoverRadius: 7, order: 1
             }]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
+            layout: { padding: { right: window.innerWidth < 768 ? 8 : 0 } },
             interaction: { intersect: false, mode: 'index' },
-            plugins: { legend: { labels: { color:'#9aa0a8', font:{size:10}, usePointStyle:true, pointStyle:'circle' } }, tooltip: { ...TS, callbacks: { title: ctx => raw[ctx[0].dataIndex].title, label: ctx => ctx.dataset.type==='line' ? 'Avg: '+ctx.parsed.y+'%' : ctx.parsed.y+'% ('+raw[ctx.dataIndex].c+'/'+raw[ctx.dataIndex].t+')' } } },
-            scales: { x: { ticks:{color:'#5f6572',font:{size:10}}, grid:{color:'rgba(255,255,255,0.03)'} }, y: { min:0, max:100, ticks:{color:'#5f6572',callback:v=>v+'%'}, grid:{color:'rgba(255,255,255,0.04)'} } }
+            animation: { duration: 800, easing: 'easeOutQuart' },
+            plugins: { legend: { position: window.innerWidth < 768 ? 'bottom' : 'top', labels: { color:'#6B7280', font:{size: window.innerWidth < 768 ? 10 : 11,weight:600}, usePointStyle:true, pointStyle:'circle', padding: window.innerWidth < 768 ? 10 : 16 } }, tooltip: { ...TS, callbacks: { title: ctx => raw[ctx[0].dataIndex].title, label: ctx => ctx.dataset.type==='line' ? ' Avg: '+ctx.parsed.y+'%' : ' '+ctx.parsed.y+'% ('+raw[ctx.dataIndex].c+'/'+raw[ctx.dataIndex].t+')' } } },
+            scales: {
+                x: { ticks:{color:'#9CA3AF',font:{size:10}}, grid:{display:false}, border:{display:false} },
+                y: { min:0, max:100, ticks:{color:'#9CA3AF',callback:v=>v+'%',stepSize:25}, grid:{color:'#F3F4F6'}, border:{display:false} }
+            }
         }
     });
 }
@@ -267,8 +274,8 @@ const distCtx = document.getElementById('distChart');
 if (distCtx) {
     new Chart(distCtx, {
         type: 'doughnut',
-        data: { labels: ['70-100%','40-69%','0-39%'], datasets: [{ data: [<?= $dist['high'] ?>,<?= $dist['mid'] ?>,<?= $dist['low'] ?>], backgroundColor: ['rgba(16,185,129,0.7)','rgba(255,193,7,0.7)','rgba(255,56,96,0.7)'], borderColor:'#0f1117', borderWidth:3, hoverOffset:6 }] },
-        options: { responsive:true, maintainAspectRatio:false, cutout:'55%', plugins: { legend:{display:false}, tooltip:TS } }
+        data: { labels: ['70-100%','40-69%','0-39%'], datasets: [{ data: [<?= $dist['high'] ?>,<?= $dist['mid'] ?>,<?= $dist['low'] ?>], backgroundColor: ['#10B981','#FBBF24','#EF4444'], borderColor:'#fff', borderWidth:3, hoverOffset:8, borderRadius:4, spacing:2 }] },
+        options: { responsive:true, maintainAspectRatio:false, cutout:'60%', animation:{duration:800,easing:'easeOutQuart'}, plugins: { legend:{display:false}, tooltip:TS } }
     });
 }
 
@@ -279,13 +286,18 @@ if (topicCtx) {
     new Chart(topicCtx, {
         type: 'bar',
         data: {
-            labels: topics.map(t => t.name.length > 22 ? t.name.substring(0,22)+'..' : t.name),
-            datasets: [{ data: topics.map(t => t.pct), backgroundColor: topics.map(t => t.pct >= 70 ? 'rgba(16,185,129,0.65)' : t.pct >= 40 ? 'rgba(245,158,11,0.65)' : 'rgba(239,68,68,0.65)'), borderColor: topics.map(t => t.pct >= 70 ? '#10B981' : t.pct >= 40 ? '#F59E0B' : '#EF4444'), borderWidth:1.5, borderRadius:5, borderSkipped:false }]
+            labels: topics.map(t => { const max = window.innerWidth < 768 ? 14 : 22; return t.name.length > max ? t.name.substring(0,max)+'…' : t.name; }),
+            datasets: [{ data: topics.map(t => t.pct), backgroundColor: topics.map(t => t.pct >= 70 ? '#10B981' : t.pct >= 40 ? '#FBBF24' : '#EF4444'), borderRadius:6, borderSkipped:false, barPercentage:0.55, categoryPercentage:0.8 }]
         },
         options: {
             indexAxis:'y', responsive:true, maintainAspectRatio:false,
-            plugins: { legend:{display:false}, tooltip:{ ...TS, callbacks:{ label: ctx => ctx.parsed.x+'% ('+topics[ctx.dataIndex].c+'/'+topics[ctx.dataIndex].t+')' } } },
-            scales: { x:{min:0,max:100,ticks:{color:'#5f6572',callback:v=>v+'%'},grid:{color:'rgba(255,255,255,0.04)'}}, y:{ticks:{color:'#9aa0a8',font:{size:10}},grid:{display:false}} }
+            layout: { padding: { right: window.innerWidth < 768 ? 10 : 0 } },
+            animation: { duration: 800, easing: 'easeOutQuart' },
+            plugins: { legend:{display:false}, tooltip:{ ...TS, callbacks:{ label: ctx => ' '+ctx.parsed.x+'% ('+topics[ctx.dataIndex].c+'/'+topics[ctx.dataIndex].t+' correct)' } } },
+            scales: {
+                x: { min:0, max:100, ticks:{color:'#9CA3AF',font:{size:10},callback:v=>v+'%',stepSize:25}, grid:{color:'#F3F4F6'}, border:{display:false} },
+                y: { ticks:{color:'#4B5563',font:{size:11,weight:600}}, grid:{display:false}, border:{display:false} }
+            }
         }
     });
 }
